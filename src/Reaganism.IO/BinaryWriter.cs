@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Reaganism.IO;
 
@@ -18,6 +19,7 @@ public interface IBinaryWriter : IDisposable
     /// </summary>
     long Length { get; }
 
+#region Primitive types
     /// <summary>
     ///     Writes a signed 8-bit integer.
     /// </summary>
@@ -67,7 +69,9 @@ public interface IBinaryWriter : IDisposable
     ///     Writes a double-precision floating-point number.
     /// </summary>
     void F64(double value);
+#endregion
 
+#region Contiguous memory
     /// <summary>
     ///     Writes a span of bytes to the data source.
     /// </summary>
@@ -77,11 +81,123 @@ public interface IBinaryWriter : IDisposable
     ///     Writes an array of bytes to the data source.
     /// </summary>
     void Array(byte[] bytes);
+#endregion
 
+#region Disposal
     /// <summary>
     ///     Flushes the writer.
     /// </summary>
     void Flush();
+#endregion
 }
 
-public readonly unsafe partial struct BinaryWriter { }
+/// <summary>
+///     Writes primitive data types and contiguous blocks of memory to an
+///     arbitrary data source.
+/// </summary>
+/// <remarks>
+///     Wraps an <see cref="IBinaryWriter"/> implementation.
+///     <br />
+///     Uses system endianness by default; use <see cref="BigEndian"/> and
+///     <see cref="LittleEndian"/> for explicit endianness.
+/// </remarks>
+public readonly unsafe partial struct BinaryWriter(IBinaryWriter impl) : IBinaryWriter
+{
+    public long Position
+    {
+        get => impl.Position;
+        set => impl.Position = value;
+    }
+
+    public long Length => impl.Length;
+
+#region Primitive types
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void S8(sbyte value)
+    {
+        impl.S8(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void U8(byte value)
+    {
+        impl.U8(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void S16(short value)
+    {
+        impl.S16(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void U16(ushort value)
+    {
+        impl.U16(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void S32(int value)
+    {
+        impl.S32(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void U32(uint value)
+    {
+        impl.U32(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void S64(long value)
+    {
+        impl.S64(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void U64(ulong value)
+    {
+        impl.U64(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void F32(float value)
+    {
+        impl.F32(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void F64(double value)
+    {
+        impl.F64(value);
+    }
+#endregion
+
+#region Contiguous memory
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Span(Span<byte> value)
+    {
+        impl.Span(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Array(byte[] value)
+    {
+        impl.Array(value);
+    }
+#endregion
+
+#region Disposal
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Flush()
+    {
+        impl.Flush();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Dispose()
+    {
+        impl.Dispose();
+    }
+#endregion
+}
