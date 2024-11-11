@@ -639,7 +639,8 @@ public static class BinaryReaderExtensions
     ///     Reads a wide (32-bit) boolean value.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool BooleanWide(this IBinaryReader @this)
+    public static bool BooleanWide<TReader>(this TReader @this)
+        where TReader : struct, IBinaryReader
     {
         var value = @this.U32();
         {
@@ -658,7 +659,8 @@ public static class BinaryReaderExtensions
     ///     Reads a narrow (8-bit) boolean value.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool BooleanNarrow(this IBinaryReader @this)
+    public static bool BooleanNarrow<TReader>(this TReader @this)
+        where TReader : struct, IBinaryReader
     {
         var value = @this.U8();
         {

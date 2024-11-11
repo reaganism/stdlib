@@ -469,7 +469,8 @@ public static class BinaryWriterExtensions
     ///     Writes a wide (32-bit) boolean value.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void BooleanWide(this IBinaryWriter @this, bool value)
+    public static void BooleanWide<TWriter>(this TWriter @this, bool value)
+        where TWriter : struct, IBinaryWriter
     {
         @this.U32(value ? 1u : 0u);
     }
@@ -478,7 +479,8 @@ public static class BinaryWriterExtensions
     ///     Writes a narrow (8-bit) boolean value.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void BooleanNarrow(this IBinaryWriter @this, bool value)
+    public static void BooleanNarrow<TWriter>(this TWriter @this, bool value)
+        where TWriter : struct, IBinaryWriter
     {
         @this.U8(value ? (byte)1 : (byte)0);
     }
