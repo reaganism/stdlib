@@ -102,7 +102,7 @@ public interface IBinaryWriter : IDisposable
 ///     Uses system endianness by default; use <see cref="BigEndian"/> and
 ///     <see cref="LittleEndian"/> for explicit endianness.
 /// </remarks>
-public readonly unsafe partial struct BinaryWriter(IBinaryWriter impl) : IBinaryWriter
+public readonly struct BinaryWriter(IBinaryWriter impl) : IBinaryWriter
 {
     public long Position
     {

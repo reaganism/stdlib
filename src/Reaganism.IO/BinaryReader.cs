@@ -101,7 +101,7 @@ public interface IBinaryReader : IDisposable
 ///     Uses system endianness by default; use <see cref="BigEndian"/> and
 ///     <see cref="LittleEndian"/> for explicit endianness.
 /// </remarks>
-public readonly unsafe partial struct BinaryReader(IBinaryReader impl) : IBinaryReader
+public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
 {
     public long Position
     {
