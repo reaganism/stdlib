@@ -1,6 +1,7 @@
 using System;
 using System.Buffers.Binary;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace Reaganism.IO;
@@ -78,10 +79,7 @@ public interface IBinaryReader : IDisposable
     ///     Reads a span of bytes from the data source.
     /// </summary>
     /// <param name="span">The span to write to.</param>
-    /// <returns>
-    ///     The amount of data filled; may not be the entire span.
-    /// </returns>
-    int Span(Span<byte> span);
+    void Span(ref Span<byte> span);
 
     /// <summary>
     ///     Reads an array of bytes from the data source.
@@ -103,6 +101,213 @@ public interface IBinaryReader : IDisposable
 /// </remarks>
 public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
 {
+    private sealed class Contiguous(byte[] data) : IBinaryReader
+    {
+        public long Position { get; set; }
+
+        public long Length => data.Length;
+
+        private T Read<T>() where T : unmanaged
+        {
+            var value = Unsafe.As<byte, T>(ref data[Position]);
+            Position += sizeof(T);
+            return value;
+        }
+
+#region Primitive types
+        sbyte IBinaryReader.S8()
+        {
+            return (sbyte)data[Position++];
+        }
+
+        byte IBinaryReader.U8()
+        {
+            return data[Position++];
+        }
+
+        short IBinaryReader.S16()
+        {
+            return Read<short>();
+        }
+
+        ushort IBinaryReader.U16()
+        {
+            return Read<ushort>();
+        }
+
+        int IBinaryReader.S32()
+        {
+            return Read<int>();
+        }
+
+        uint IBinaryReader.U32()
+        {
+            return Read<uint>();
+        }
+
+        long IBinaryReader.S64()
+        {
+            return Read<long>();
+        }
+
+        ulong IBinaryReader.U64()
+        {
+            return Read<ulong>();
+        }
+
+        float IBinaryReader.F32()
+        {
+            return Read<float>();
+        }
+
+        double IBinaryReader.F64()
+        {
+            return Read<double>();
+        }
+#endregion
+
+#region Contiguous memory
+        void IBinaryReader.Span(ref Span<byte> span)
+        {
+            // TODO(large-files): We assert that the ending position is within the
+            //                    bounds of a 32-bit signed integer.
+            Debug.Assert(Position + span.Length <= int.MaxValue);
+            
+            span = new Span<byte>(data, (int)Position, span.Length);
+            Position += span.Length;
+        }
+
+        byte[] IBinaryReader.Array(int length)
+        {
+            // TODO(large-files): We assert that the ending position is within the
+            //                    bounds of a 32-bit signed integer.
+            Debug.Assert(Position + length <= int.MaxValue);
+
+            var array = new byte[length];
+            Buffer.BlockCopy(data, (int)Position, array, 0, length);
+            Position += length;
+            return array;
+        }
+#endregion
+
+#region Disposal
+        void IDisposable.Dispose()
+        {
+            // No implementation necessary, there is no data to dispose of.
+        }
+#endregion
+    }
+
+    private sealed class Streamed(Stream stream, bool disposeStream) : IBinaryReader
+    {
+        public long Position { get; set; }
+
+        public long Length => stream.Length;
+        
+        private T Read<T>() where T : unmanaged
+        {
+            // TODO(perf): This isn't the most efficient approach.  We are
+            //             indeed taking advantage of streaming, but it may
+            //             prove more useful to read in chunks and interpret
+            //             that data.
+
+            var buffer = (Span<byte>)stackalloc byte[sizeof(T)];
+            {
+                var read = stream.Read(buffer);
+                {
+                    Debug.Assert(read == sizeof(T));
+                }
+            }
+
+            return Unsafe.As<byte, T>(ref buffer[0]);
+        }
+
+#region Primitive types
+        sbyte IBinaryReader.S8()
+        {
+            return (sbyte)stream.ReadByte();
+        }
+
+        byte IBinaryReader.U8()
+        {
+            return (byte)stream.ReadByte();
+        }
+
+        short IBinaryReader.S16()
+        {
+            return Read<short>();
+        }
+
+        ushort IBinaryReader.U16()
+        {
+            return Read<ushort>();
+        }
+
+        int IBinaryReader.S32()
+        {
+            return Read<int>();
+        }
+
+        uint IBinaryReader.U32()
+        {
+            return Read<uint>();
+        }
+
+        long IBinaryReader.S64()
+        {
+            return Read<long>();
+        }
+
+        ulong IBinaryReader.U64()
+        {
+            return Read<ulong>();
+        }
+
+        float IBinaryReader.F32()
+        {
+            return Read<float>();
+        }
+
+        double IBinaryReader.F64()
+        {
+            return Read<double>();
+        }
+#endregion
+
+#region Contiguous memory
+        void IBinaryReader.Span(ref Span<byte> span)
+        {
+            var read = stream.Read(span);
+            {
+                Debug.Assert(read == span.Length);
+            }
+        }
+
+        byte[] IBinaryReader.Array(int length)
+        {
+            var buffer = new byte[length];
+            {
+                var read = stream.Read(buffer);
+                {
+                    Debug.Assert(read == length);
+                }
+            }
+
+            return buffer;
+        }
+#endregion
+        
+#region Disposal
+        void IDisposable.Dispose()
+        {
+            if (disposeStream)
+            {
+                stream.Dispose();
+            }
+        }
+#endregion
+    }
+
     public long Position
     {
         get => impl.Position;
@@ -215,11 +420,11 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
 
 #region Contiguous memory
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Span(Span<byte> span)
+    public void Span(ref Span<byte> span)
     {
         AssertSize(span.Length);
         {
-            return impl.Span(span);
+            impl.Span(ref span);
         }
     }
 
@@ -375,9 +580,9 @@ public readonly ref struct BinaryReader<TFromEndian, TToEndian>(BinaryReader rea
 
 #region Contiguous memory
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int Span(Span<byte> span)
+    public void Span(ref Span<byte> span)
     {
-        return reader.Span(span);
+        reader.Span(ref span);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
