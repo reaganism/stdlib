@@ -105,7 +105,7 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
     {
         public long Position { get; set; }
 
-        public long Length => data.Length;
+        long IBinaryReader.Length => data.Length;
 
         private T Read<T>() where T : unmanaged
         {
@@ -202,7 +202,7 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
     {
         public long Position { get; set; }
 
-        public long Length => stream.Length;
+        long IBinaryReader.Length => stream.Length;
         
         private T Read<T>() where T : unmanaged
         {
@@ -219,17 +219,20 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
                 }
             }
 
+            Position += sizeof(T);
             return Unsafe.As<byte, T>(ref buffer[0]);
         }
 
 #region Primitive types
         sbyte IBinaryReader.S8()
         {
+            Position++;
             return (sbyte)stream.ReadByte();
         }
 
         byte IBinaryReader.U8()
         {
+            Position++;
             return (byte)stream.ReadByte();
         }
 

@@ -1,5 +1,7 @@
 using System;
 using System.Buffers.Binary;
+using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace Reaganism.IO;
@@ -104,6 +106,118 @@ public interface IBinaryWriter : IDisposable
 /// </remarks>
 public readonly struct BinaryWriter(IBinaryWriter impl) : IBinaryWriter
 {
+    private sealed class Streamed(Stream stream, bool disposeStream) : IBinaryWriter
+    {
+        long IBinaryWriter.Position
+        {
+            get => stream.Position;
+            set => stream.Position = value;
+        }
+
+        long IBinaryWriter.Length => stream.Length;
+
+#region Primitive types
+        void IBinaryWriter.S8(sbyte value)
+        {
+            stream.WriteByte((byte)value);
+        }
+
+        void IBinaryWriter.U8(byte value)
+        {
+            stream.WriteByte(value);
+        }
+
+        void IBinaryWriter.S16(short value)
+        {
+            stream.WriteByte((byte)value);
+            stream.WriteByte((byte)(value >> 0x8));
+        }
+
+        void IBinaryWriter.U16(ushort value)
+        {
+            stream.WriteByte((byte)value);
+            stream.WriteByte((byte)(value >> 0x8));
+        }
+
+        void IBinaryWriter.S32(int value)
+        {
+            stream.WriteByte((byte)value);
+            stream.WriteByte((byte)(value >> 0x8));
+            stream.WriteByte((byte)(value >> 0x10));
+            stream.WriteByte((byte)(value >> 0x18));
+        }
+
+        void IBinaryWriter.U32(uint value)
+        {
+            stream.WriteByte((byte)value);
+            stream.WriteByte((byte)(value >> 0x8));
+            stream.WriteByte((byte)(value >> 0x10));
+            stream.WriteByte((byte)(value >> 0x18));
+        }
+
+        void IBinaryWriter.S64(long value)
+        {
+            stream.WriteByte((byte)value);
+            stream.WriteByte((byte)(value >> 0x8));
+            stream.WriteByte((byte)(value >> 0x10));
+            stream.WriteByte((byte)(value >> 0x18));
+            stream.WriteByte((byte)(value >> 0x20));
+            stream.WriteByte((byte)(value >> 0x28));
+            stream.WriteByte((byte)(value >> 0x30));
+            stream.WriteByte((byte)(value >> 0x38));
+        }
+
+        void IBinaryWriter.U64(ulong value)
+        {
+            stream.WriteByte((byte)value);
+            stream.WriteByte((byte)(value >> 0x8));
+            stream.WriteByte((byte)(value >> 0x10));
+            stream.WriteByte((byte)(value >> 0x18));
+            stream.WriteByte((byte)(value >> 0x20));
+            stream.WriteByte((byte)(value >> 0x28));
+            stream.WriteByte((byte)(value >> 0x30));
+            stream.WriteByte((byte)(value >> 0x38));
+        }
+
+        void IBinaryWriter.F32(float value)
+        {
+            ((IBinaryWriter)this).S32(BitConverter.SingleToInt32Bits(value));
+        }
+
+        void IBinaryWriter.F64(double value)
+        {
+            ((IBinaryWriter)this).S64(BitConverter.DoubleToInt64Bits(value));
+        }
+#endregion
+
+#region Contiguous memory
+        void IBinaryWriter.Span(Span<byte> value)
+        {
+            stream.Write(value);
+        }
+
+        void IBinaryWriter.Array(byte[] value)
+        {
+            stream.Write(value);
+        }
+#endregion
+
+#region Disposal
+        void IBinaryWriter.Flush()
+        {
+            stream.Flush();
+        }
+
+        void IDisposable.Dispose()
+        {
+            if (disposeStream)
+            {
+                stream.Dispose();
+            }
+        }
+#endregion
+    }
+
     public long Position
     {
         get => impl.Position;
