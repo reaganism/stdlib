@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 
 namespace Reaganism.IO;
@@ -198,6 +199,122 @@ public readonly unsafe partial struct BinaryWriter(IBinaryWriter impl) : IBinary
     public void Dispose()
     {
         impl.Dispose();
+    }
+#endregion
+}
+
+/// <summary>
+///     Endian-aware wrapper around <see cref="BinaryWriter"/>.
+/// </summary>
+public readonly ref struct BinaryWriter<TFromEndian, TToEndian>(BinaryWriter writer) : IBinaryWriter
+    where TFromEndian : IEndianProvider
+    where TToEndian : IEndianProvider
+{
+    // ReSharper disable once StaticMemberInGenericType - Intentional.
+    /// <summary>
+    ///     Whether to reverse the byte order when writing data.
+    /// </summary>
+    /// <remarks>
+    ///     This is designed to be inlined by the JIT compiler at runtime so our
+    ///     APIs may collapse to a single code path.
+    /// </remarks>
+    private static readonly bool reverse_bytes = TFromEndian.Endianness != TToEndian.Endianness;
+
+    public long Position
+    {
+        get => writer.Position;
+        set => writer.Position = value;
+    }
+
+    public long Length => writer.Length;
+
+#region Primitive types
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void S8(sbyte value)
+    {
+        writer.S8(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void U8(byte value)
+    {
+        writer.U8(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void S16(short value)
+    {
+        writer.S16(reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void U16(ushort value)
+    {
+        writer.U16(reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void S32(int value)
+    {
+        writer.S32(reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void U32(uint value)
+    {
+        writer.U32(reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void S64(long value)
+    {
+        writer.S64(reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void U64(ulong value)
+    {
+        writer.U64(reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void F32(float value)
+    {
+        writer.F32(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void F64(double value)
+    {
+        writer.F64(value);
+    }
+#endregion
+
+#region Contiguous memory
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Span(Span<byte> value)
+    {
+        writer.Span(value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Array(byte[] bytes)
+    {
+        writer.Array(bytes);
+    }
+#endregion
+
+#region Disposal
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    void IBinaryWriter.Flush()
+    {
+        throw new InvalidOperationException("Use the parent BinaryWriter to flush");
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    void IDisposable.Dispose()
+    {
+        throw new InvalidOperationException("Use the parent BinaryWriter to dispose");
     }
 #endregion
 }

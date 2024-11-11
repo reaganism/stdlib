@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -253,6 +254,134 @@ public readonly unsafe partial struct BinaryReader(IBinaryReader impl) : IBinary
     private void AssertSize(int size)
     {
         Debug.Assert(Position >= 0 && Position + size <= Length);
+    }
+#endregion
+}
+
+/// <summary>
+///     Endian-aware wrapper around <see cref="BinaryReader"/>.
+/// </summary>
+public readonly ref struct BinaryReader<TFromEndian, TToEndian>(BinaryReader reader) : IBinaryReader
+    where TFromEndian : IEndianProvider
+    where TToEndian : IEndianProvider
+{
+    // ReSharper disable once StaticMemberInGenericType - Intentional.
+    /// <summary>
+    ///     Whether to reverse the byte order when reading data.
+    /// </summary>
+    /// <remarks>
+    ///     This is designed to be inlined by the JIT compiler at runtime so our
+    ///     APIs may collapse to a single code path.
+    /// </remarks>
+    private static readonly bool reverse_bytes = TFromEndian.Endianness != TToEndian.Endianness;
+
+    public long Position
+    {
+        get => reader.Position;
+        set => reader.Position = value;
+    }
+
+    public long Length => reader.Length;
+
+#region Primitive types
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public sbyte S8()
+    {
+        return reader.S8();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public byte U8()
+    {
+        return reader.U8();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public short S16()
+    {
+        var value = reader.S16();
+        {
+            return reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ushort U16()
+    {
+        var value = reader.U16();
+        {
+            return reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int S32()
+    {
+        var value = reader.S32();
+        {
+            return reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public uint U32()
+    {
+        var value = reader.U32();
+        {
+            return reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public long S64()
+    {
+        var value = reader.S64();
+        {
+            return reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public ulong U64()
+    {
+        var value = reader.U64();
+        {
+            return reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float F32()
+    {
+        return reader.F32();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public double F64()
+    {
+        return reader.F64();
+    }
+#endregion
+
+#region Contiguous memory
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int Span(Span<byte> span)
+    {
+        return reader.Span(span);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public byte[] Array(int length)
+    {
+        return reader.Array(length);
+    }
+#endregion
+
+#region Disposal
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    void IDisposable.Dispose()
+    {
+        throw new InvalidOperationException("Use the parent BinaryReader to dispose");
     }
 #endregion
 }
