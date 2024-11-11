@@ -172,8 +172,8 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
             // TODO(large-files): We assert that the ending position is within the
             //                    bounds of a 32-bit signed integer.
             Debug.Assert(Position + span.Length <= int.MaxValue);
-            
-            span = new Span<byte>(data, (int)Position, span.Length);
+
+            span     =  new Span<byte>(data, (int)Position, span.Length);
             Position += span.Length;
         }
 
@@ -196,6 +196,31 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
             // No implementation necessary, there is no data to dispose of.
         }
 #endregion
+
+#region Construction
+        /// <summary>
+        ///     Constructs a binary reader from a byte array.
+        /// </summary>
+        /// <param name="bytes">The byte array to read from.</param>
+        /// <returns>The binary reader.</returns>
+        public static BinaryReader FromByteArray(byte[] bytes)
+        {
+            return new BinaryReader(new Contiguous(bytes));
+        }
+
+        /// <summary>
+        ///     Constructs a binary reader from a stream.
+        /// </summary>
+        /// <param name="stream">The stream to read from.</param>
+        /// <param name="disposeStream">
+        ///     Whether to dispose of the stream when the reader is disposed.
+        /// </param>
+        /// <returns>The binary reader.</returns>
+        public static BinaryReader FromStream(Stream stream, bool disposeStream)
+        {
+            return new BinaryReader(new Streamed(stream, disposeStream));
+        }
+#endregion
     }
 
     private sealed class Streamed(Stream stream, bool disposeStream) : IBinaryReader
@@ -203,7 +228,7 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
         public long Position { get; set; }
 
         long IBinaryReader.Length => stream.Length;
-        
+
         private T Read<T>() where T : unmanaged
         {
             // TODO(perf): This isn't the most efficient approach.  We are
@@ -299,7 +324,7 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
             return buffer;
         }
 #endregion
-        
+
 #region Disposal
         void IDisposable.Dispose()
         {

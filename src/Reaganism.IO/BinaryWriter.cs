@@ -325,6 +325,22 @@ public readonly struct BinaryWriter(IBinaryWriter impl) : IBinaryWriter
         impl.Dispose();
     }
 #endregion
+
+#region Construction
+    /// <summary>
+    ///     Constructs a binary writer from a stream.
+    /// </summary>
+    /// <param name="stream">The stream to write to.</param>
+    /// <param name="disposeStream">Whether to dispose of the stream.</param>
+    /// <returns>The binary writer.</returns>
+    public static BinaryWriter FromStream(
+        Stream stream,
+        bool   disposeStream = true
+    )
+    {
+        return new BinaryWriter(new Streamed(stream, disposeStream));
+    }
+#endregion
 }
 
 /// <summary>
