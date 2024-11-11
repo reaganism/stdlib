@@ -201,3 +201,29 @@ public readonly unsafe partial struct BinaryWriter(IBinaryWriter impl) : IBinary
     }
 #endregion
 }
+
+/// <summary>
+///     Provides extensions methods for <see cref="IBinaryWriter"/>.
+/// </summary>
+public static class BinaryWriterExtensions
+{
+#region Boolean writing
+    /// <summary>
+    ///     Writes a wide (32-bit) boolean value.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void BooleanWide(this IBinaryWriter @this, bool value)
+    {
+        @this.U32(value ? 1u : 0u);
+    }
+
+    /// <summary>
+    ///     Writes a narrow (8-bit) boolean value.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void BooleanNarrow(this IBinaryWriter @this, bool value)
+    {
+        @this.U8(value ? (byte)1 : (byte)0);
+    }
+#endregion
+}

@@ -256,3 +256,49 @@ public readonly unsafe partial struct BinaryReader(IBinaryReader impl) : IBinary
     }
 #endregion
 }
+
+/// <summary>
+///     Provides extension methods for <see cref="IBinaryReader"/>.
+/// </summary>
+public static class BinaryReaderExtensions
+{
+#region Boolean reading
+    /// <summary>
+    ///     Reads a wide (32-bit) boolean value.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool BooleanWide(this IBinaryReader @this)
+    {
+        var value = @this.U32();
+        {
+            // Boolean values should be '0' or '1'.  Technically, the only
+            // requirement is that we treat zero as falsy and non-zero as
+            // truthy.  Regardless, we can typically reliably deduce that our
+            // reading has gone astray if we happen to expect a boolean value
+            // and we encounter a value that is not '0' or '1'.
+            Debug.Assert(value is 0 or 1);
+        }
+
+        return value != 0;
+    }
+
+    /// <summary>
+    ///     Reads a narrow (8-bit) boolean value.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool BooleanNarrow(this IBinaryReader @this)
+    {
+        var value = @this.U8();
+        {
+            // Boolean values should be '0' or '1'.  Technically, the only
+            // requirement is that we treat zero as falsy and non-zero as
+            // truthy.  Regardless, we can typically reliably deduce that our
+            // reading has gone astray if we happen to expect a boolean value
+            // and we encounter a value that is not '0' or '1'.
+            Debug.Assert(value is 0 or 1);
+        }
+
+        return value != 0;
+    }
+#endregion
+}
