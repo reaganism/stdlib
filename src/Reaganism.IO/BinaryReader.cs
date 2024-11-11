@@ -111,6 +111,16 @@ public readonly unsafe partial struct BinaryReader(IBinaryReader impl) : IBinary
 
     public long Length => impl.Length;
 
+    /// <summary>
+    ///     Reads data in big-endian byte order.
+    /// </summary>
+    public BinaryReader<BigEndian, SystemEndian> BigEndian => new(this);
+
+    /// <summary>
+    ///     Reads data in little-endian byte order.
+    /// </summary>
+    public BinaryReader<LittleEndian, SystemEndian> LittleEndian => new(this);
+
 #region Primitive types
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public sbyte S8()

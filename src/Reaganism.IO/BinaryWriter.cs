@@ -112,6 +112,16 @@ public readonly unsafe partial struct BinaryWriter(IBinaryWriter impl) : IBinary
 
     public long Length => impl.Length;
 
+    /// <summary>
+    ///     Writes data in big-endian byte order.
+    /// </summary>
+    public BinaryWriter<BigEndian, SystemEndian> BigEndian => new(this);
+
+    /// <summary>
+    ///     Writes data in little-endian byte order.
+    /// </summary>
+    public BinaryWriter<LittleEndian, SystemEndian> LittleEndian => new(this);
+
 #region Primitive types
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void S8(sbyte value)
