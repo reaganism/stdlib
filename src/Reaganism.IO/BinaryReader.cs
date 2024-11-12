@@ -196,31 +196,6 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
             // No implementation necessary, there is no data to dispose of.
         }
 #endregion
-
-#region Construction
-        /// <summary>
-        ///     Constructs a binary reader from a byte array.
-        /// </summary>
-        /// <param name="bytes">The byte array to read from.</param>
-        /// <returns>The binary reader.</returns>
-        public static BinaryReader FromByteArray(byte[] bytes)
-        {
-            return new BinaryReader(new Contiguous(bytes));
-        }
-
-        /// <summary>
-        ///     Constructs a binary reader from a stream.
-        /// </summary>
-        /// <param name="stream">The stream to read from.</param>
-        /// <param name="disposeStream">
-        ///     Whether to dispose of the stream when the reader is disposed.
-        /// </param>
-        /// <returns>The binary reader.</returns>
-        public static BinaryReader FromStream(Stream stream, bool disposeStream)
-        {
-            return new BinaryReader(new Streamed(stream, disposeStream));
-        }
-#endregion
     }
 
     private sealed class Streamed(Stream stream, bool disposeStream) : IBinaryReader
@@ -497,6 +472,31 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
     private void AssertSize(int size)
     {
         Debug.Assert(Position >= 0 && Position + size <= Length);
+    }
+#endregion
+
+#region Construction
+    /// <summary>
+    ///     Constructs a binary reader from a byte array.
+    /// </summary>
+    /// <param name="bytes">The byte array to read from.</param>
+    /// <returns>The binary reader.</returns>
+    public static BinaryReader FromByteArray(byte[] bytes)
+    {
+        return new BinaryReader(new Contiguous(bytes));
+    }
+
+    /// <summary>
+    ///     Constructs a binary reader from a stream.
+    /// </summary>
+    /// <param name="stream">The stream to read from.</param>
+    /// <param name="disposeStream">
+    ///     Whether to dispose of the stream when the reader is disposed.
+    /// </param>
+    /// <returns>The binary reader.</returns>
+    public static BinaryReader FromStream(Stream stream, bool disposeStream)
+    {
+        return new BinaryReader(new Streamed(stream, disposeStream));
     }
 #endregion
 }
