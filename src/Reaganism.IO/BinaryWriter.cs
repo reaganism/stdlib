@@ -3,6 +3,7 @@ using System.Buffers.Binary;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Reaganism.IO;
 
@@ -22,59 +23,13 @@ public interface IBinaryWriter : IDisposable
     /// </summary>
     long Length { get; }
 
-#region Primitive types
     /// <summary>
-    ///     Writes a signed 8-bit integer.
+    ///     Writes a value of type <typeparamref name="T"/> to the data source.
     /// </summary>
-    void S8(sbyte value);
+    /// <param name="value">The value to read.</param>
+    /// <typeparam name="T">The type of the value.</typeparam>
+    void Write<T>(T value) where T : unmanaged;
 
-    /// <summary>
-    ///     Writes an unsigned 8-bit integer.
-    /// </summary>
-    void U8(byte value);
-
-    /// <summary>
-    ///     Writes a signed 16-bit integer.
-    /// </summary>
-    void S16(short value);
-
-    /// <summary>
-    ///     Writes an unsigned 16-bit integer.
-    /// </summary>
-    void U16(ushort value);
-
-    /// <summary>
-    ///     Writes a signed 32-bit integer.
-    /// </summary>
-    void S32(int value);
-
-    /// <summary>
-    ///     Writes an unsigned 32-bit integer.
-    /// </summary>
-    void U32(uint value);
-
-    /// <summary>
-    ///     Writes a signed 64-bit integer.
-    /// </summary>
-    void S64(long value);
-
-    /// <summary>
-    ///     Writes an unsigned 64-bit integer.
-    /// </summary>
-    void U64(ulong value);
-
-    /// <summary>
-    ///     Writes a single-precision floating-point number.
-    /// </summary>
-    void F32(float value);
-
-    /// <summary>
-    ///     Writes a double-precision floating-point number.
-    /// </summary>
-    void F64(double value);
-#endregion
-
-#region Contiguous memory
     /// <summary>
     ///     Writes a span of bytes to the data source.
     /// </summary>
@@ -84,7 +39,6 @@ public interface IBinaryWriter : IDisposable
     ///     Writes an array of bytes to the data source.
     /// </summary>
     void Array(byte[] bytes);
-#endregion
 
 #region Disposal
     /// <summary>
@@ -116,81 +70,87 @@ public readonly struct BinaryWriter(IBinaryWriter impl) : IBinaryWriter
 
         long IBinaryWriter.Length => stream.Length;
 
-#region Primitive types
-        void IBinaryWriter.S8(sbyte value)
+        unsafe void IBinaryWriter.Write<T>(T value)
         {
-            stream.WriteByte((byte)value);
+            // Fast paths: manually write bytes for primitive types of known
+            // sizes.
+            if (typeof(T) == typeof(byte))
+            {
+                stream.WriteByte((byte)(object)value);
+                return;
+            }
+
+            if (typeof(T) == typeof(sbyte))
+            {
+                stream.WriteByte((byte)(sbyte)(object)value);
+                return;
+            }
+
+            if (typeof(T) == typeof(short))
+            {
+                stream.WriteByte((byte)(short)(object)value);
+                stream.WriteByte((byte)((short)(object)value >> 0x8));
+                return;
+            }
+
+            if (typeof(T) == typeof(ushort))
+            {
+                stream.WriteByte((byte)(ushort)(object)value);
+                stream.WriteByte((byte)((ushort)(object)value >> 0x8));
+                return;
+            }
+
+            if (typeof(T) == typeof(int))
+            {
+                stream.WriteByte((byte)(int)(object)value);
+                stream.WriteByte((byte)((int)(object)value >> 0x8));
+                stream.WriteByte((byte)((int)(object)value >> 0x10));
+                stream.WriteByte((byte)((int)(object)value >> 0x18));
+                return;
+            }
+
+            if (typeof(T) == typeof(uint))
+            {
+                stream.WriteByte((byte)(uint)(object)value);
+                stream.WriteByte((byte)((uint)(object)value >> 0x8));
+                stream.WriteByte((byte)((uint)(object)value >> 0x10));
+                stream.WriteByte((byte)((uint)(object)value >> 0x18));
+                return;
+            }
+
+            if (typeof(T) == typeof(long))
+            {
+                stream.WriteByte((byte)(long)(object)value);
+                stream.WriteByte((byte)((long)(object)value >> 0x8));
+                stream.WriteByte((byte)((long)(object)value >> 0x10));
+                stream.WriteByte((byte)((long)(object)value >> 0x18));
+                stream.WriteByte((byte)((long)(object)value >> 0x20));
+                stream.WriteByte((byte)((long)(object)value >> 0x28));
+                stream.WriteByte((byte)((long)(object)value >> 0x30));
+                stream.WriteByte((byte)((long)(object)value >> 0x38));
+                return;
+            }
+
+            if (typeof(T) == typeof(ulong))
+            {
+                stream.WriteByte((byte)(ulong)(object)value);
+                stream.WriteByte((byte)((ulong)(object)value >> 0x8));
+                stream.WriteByte((byte)((ulong)(object)value >> 0x10));
+                stream.WriteByte((byte)((ulong)(object)value >> 0x18));
+                stream.WriteByte((byte)((ulong)(object)value >> 0x20));
+                stream.WriteByte((byte)((ulong)(object)value >> 0x28));
+                stream.WriteByte((byte)((ulong)(object)value >> 0x30));
+                stream.WriteByte((byte)((ulong)(object)value >> 0x38));
+                return;
+            }
+
+            // Slow path: write bytes for unknown types.  This is also the path
+            // used for floating-point types.
+            Span<byte> bytes = stackalloc byte[sizeof(T)];
+            Unsafe.WriteUnaligned(ref MemoryMarshal.GetReference(bytes), value);
+            stream.Write(bytes);
         }
 
-        void IBinaryWriter.U8(byte value)
-        {
-            stream.WriteByte(value);
-        }
-
-        void IBinaryWriter.S16(short value)
-        {
-            stream.WriteByte((byte)value);
-            stream.WriteByte((byte)(value >> 0x8));
-        }
-
-        void IBinaryWriter.U16(ushort value)
-        {
-            stream.WriteByte((byte)value);
-            stream.WriteByte((byte)(value >> 0x8));
-        }
-
-        void IBinaryWriter.S32(int value)
-        {
-            stream.WriteByte((byte)value);
-            stream.WriteByte((byte)(value >> 0x8));
-            stream.WriteByte((byte)(value >> 0x10));
-            stream.WriteByte((byte)(value >> 0x18));
-        }
-
-        void IBinaryWriter.U32(uint value)
-        {
-            stream.WriteByte((byte)value);
-            stream.WriteByte((byte)(value >> 0x8));
-            stream.WriteByte((byte)(value >> 0x10));
-            stream.WriteByte((byte)(value >> 0x18));
-        }
-
-        void IBinaryWriter.S64(long value)
-        {
-            stream.WriteByte((byte)value);
-            stream.WriteByte((byte)(value >> 0x8));
-            stream.WriteByte((byte)(value >> 0x10));
-            stream.WriteByte((byte)(value >> 0x18));
-            stream.WriteByte((byte)(value >> 0x20));
-            stream.WriteByte((byte)(value >> 0x28));
-            stream.WriteByte((byte)(value >> 0x30));
-            stream.WriteByte((byte)(value >> 0x38));
-        }
-
-        void IBinaryWriter.U64(ulong value)
-        {
-            stream.WriteByte((byte)value);
-            stream.WriteByte((byte)(value >> 0x8));
-            stream.WriteByte((byte)(value >> 0x10));
-            stream.WriteByte((byte)(value >> 0x18));
-            stream.WriteByte((byte)(value >> 0x20));
-            stream.WriteByte((byte)(value >> 0x28));
-            stream.WriteByte((byte)(value >> 0x30));
-            stream.WriteByte((byte)(value >> 0x38));
-        }
-
-        void IBinaryWriter.F32(float value)
-        {
-            ((IBinaryWriter)this).S32(BitConverter.SingleToInt32Bits(value));
-        }
-
-        void IBinaryWriter.F64(double value)
-        {
-            ((IBinaryWriter)this).S64(BitConverter.DoubleToInt64Bits(value));
-        }
-#endregion
-
-#region Contiguous memory
         void IBinaryWriter.Span(Span<byte> value)
         {
             stream.Write(value);
@@ -200,7 +160,6 @@ public readonly struct BinaryWriter(IBinaryWriter impl) : IBinaryWriter
         {
             stream.Write(value);
         }
-#endregion
 
 #region Disposal
         void IBinaryWriter.Flush()
@@ -236,69 +195,12 @@ public readonly struct BinaryWriter(IBinaryWriter impl) : IBinaryWriter
     /// </summary>
     public BinaryWriter<LittleEndian, SystemEndian> LittleEndian => new(this);
 
-#region Primitive types
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void S8(sbyte value)
+    public void Write<T>(T value) where T : unmanaged
     {
-        impl.S8(value);
+        impl.Write(value);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void U8(byte value)
-    {
-        impl.U8(value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void S16(short value)
-    {
-        impl.S16(value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void U16(ushort value)
-    {
-        impl.U16(value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void S32(int value)
-    {
-        impl.S32(value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void U32(uint value)
-    {
-        impl.U32(value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void S64(long value)
-    {
-        impl.S64(value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void U64(ulong value)
-    {
-        impl.U64(value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void F32(float value)
-    {
-        impl.F32(value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void F64(double value)
-    {
-        impl.F64(value);
-    }
-#endregion
-
-#region Contiguous memory
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Span(Span<byte> value)
     {
@@ -310,7 +212,6 @@ public readonly struct BinaryWriter(IBinaryWriter impl) : IBinaryWriter
     {
         impl.Array(value);
     }
-#endregion
 
 #region Disposal
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -368,69 +269,12 @@ public readonly ref struct BinaryWriter<TFromEndian, TToEndian>(BinaryWriter wri
 
     public long Length => writer.Length;
 
-#region Primitive types
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void S8(sbyte value)
+    public void Write<T>(T value) where T : unmanaged
     {
-        writer.S8(value);
+        writer.Write(reverse_bytes ? EndianHelper.ReverseEndianness(value) : value);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void U8(byte value)
-    {
-        writer.U8(value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void S16(short value)
-    {
-        writer.S16(reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void U16(ushort value)
-    {
-        writer.U16(reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void S32(int value)
-    {
-        writer.S32(reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void U32(uint value)
-    {
-        writer.U32(reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void S64(long value)
-    {
-        writer.S64(reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void U64(ulong value)
-    {
-        writer.U64(reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void F32(float value)
-    {
-        writer.F32(value);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void F64(double value)
-    {
-        writer.F64(value);
-    }
-#endregion
-
-#region Contiguous memory
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Span(Span<byte> value)
     {
@@ -442,7 +286,6 @@ public readonly ref struct BinaryWriter<TFromEndian, TToEndian>(BinaryWriter wri
     {
         writer.Array(bytes);
     }
-#endregion
 
 #region Disposal
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -472,7 +315,7 @@ public static class BinaryWriterExtensions
     public static void BooleanWide<TWriter>(this TWriter @this, bool value)
         where TWriter : struct, IBinaryWriter
     {
-        @this.U32(value ? 1u : 0u);
+        @this.Write(value ? 1u : 0u);
     }
 
     /// <summary>
@@ -482,7 +325,7 @@ public static class BinaryWriterExtensions
     public static void BooleanNarrow<TWriter>(this TWriter @this, bool value)
         where TWriter : struct, IBinaryWriter
     {
-        @this.U8(value ? (byte)1 : (byte)0);
+        @this.Write(value ? (byte)1 : (byte)0);
     }
 #endregion
 }

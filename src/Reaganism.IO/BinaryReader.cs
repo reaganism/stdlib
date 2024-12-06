@@ -22,59 +22,14 @@ public interface IBinaryReader : IDisposable
     /// </summary>
     long Length { get; }
 
-#region Primitive types
     /// <summary>
-    ///     Reads a signed 8-bit integer.
+    ///     Reads an unmanaged type <typeparamref name="T"/> from the data
+    ///     source.
     /// </summary>
-    sbyte S8();
+    /// <typeparam name="T">The type to read.</typeparam>
+    /// <returns>The value read from the data source.</returns>
+    T Read<T>() where T : unmanaged;
 
-    /// <summary>
-    ///     Reads an unsigned 8-bit integer.
-    /// </summary>
-    byte U8();
-
-    /// <summary>
-    ///     Reads a signed 16-bit integer.
-    /// </summary>
-    short S16();
-
-    /// <summary>
-    ///     Reads an unsigned 16-bit integer.
-    /// </summary>
-    ushort U16();
-
-    /// <summary>
-    ///     Reads a signed 32-bit integer.
-    /// </summary>
-    int S32();
-
-    /// <summary>
-    ///     Reads an unsigned 32-bit integer.
-    /// </summary>
-    uint U32();
-
-    /// <summary>
-    ///     Reads a signed 64-bit integer.
-    /// </summary>
-    long S64();
-
-    /// <summary>
-    ///     Reads an unsigned 64-bit integer.
-    /// </summary>
-    ulong U64();
-
-    /// <summary>
-    ///     Reads a single-precision floating-point number.
-    /// </summary>
-    float F32();
-
-    /// <summary>
-    ///     Reads a double-precision floating-point number.
-    /// </summary>
-    double F64();
-#endregion
-
-#region Contiguous memory
     /// <summary>
     ///     Reads a span of bytes from the data source.
     /// </summary>
@@ -86,7 +41,6 @@ public interface IBinaryReader : IDisposable
     /// </summary>
     /// <param name="length">The length of data to read.</param>
     byte[] Array(int length);
-#endregion
 }
 
 /// <summary>
@@ -107,66 +61,18 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
 
         long IBinaryReader.Length => data.Length;
 
-        private T Read<T>() where T : unmanaged
+        T IBinaryReader.Read<T>()
         {
+            if (typeof(T) == typeof(sbyte) || typeof(T) == typeof(byte))
+            {
+                return Unsafe.As<byte, T>(ref data[Position++]);
+            }
+
             var value = Unsafe.As<byte, T>(ref data[Position]);
             Position += sizeof(T);
             return value;
         }
 
-#region Primitive types
-        sbyte IBinaryReader.S8()
-        {
-            return (sbyte)data[Position++];
-        }
-
-        byte IBinaryReader.U8()
-        {
-            return data[Position++];
-        }
-
-        short IBinaryReader.S16()
-        {
-            return Read<short>();
-        }
-
-        ushort IBinaryReader.U16()
-        {
-            return Read<ushort>();
-        }
-
-        int IBinaryReader.S32()
-        {
-            return Read<int>();
-        }
-
-        uint IBinaryReader.U32()
-        {
-            return Read<uint>();
-        }
-
-        long IBinaryReader.S64()
-        {
-            return Read<long>();
-        }
-
-        ulong IBinaryReader.U64()
-        {
-            return Read<ulong>();
-        }
-
-        float IBinaryReader.F32()
-        {
-            return Read<float>();
-        }
-
-        double IBinaryReader.F64()
-        {
-            return Read<double>();
-        }
-#endregion
-
-#region Contiguous memory
         void IBinaryReader.Span(ref Span<byte> span)
         {
             // TODO(large-files): We assert that the ending position is within the
@@ -188,7 +94,6 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
             Position += length;
             return array;
         }
-#endregion
 
 #region Disposal
         void IDisposable.Dispose()
@@ -204,8 +109,20 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
 
         long IBinaryReader.Length => stream.Length;
 
-        private T Read<T>() where T : unmanaged
+        T IBinaryReader.Read<T>()
         {
+            if (typeof(T) == typeof(sbyte) || typeof(T) == typeof(byte))
+            {
+                var b = stream.ReadByte();
+                {
+                    Debug.Assert(b != -1);
+                    b = (byte)b;
+                }
+
+                Position++;
+                return Unsafe.As<int, T>(ref b);
+            }
+
             // TODO(perf): This isn't the most efficient approach.  We are
             //             indeed taking advantage of streaming, but it may
             //             prove more useful to read in chunks and interpret
@@ -223,61 +140,6 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
             return Unsafe.As<byte, T>(ref buffer[0]);
         }
 
-#region Primitive types
-        sbyte IBinaryReader.S8()
-        {
-            Position++;
-            return (sbyte)stream.ReadByte();
-        }
-
-        byte IBinaryReader.U8()
-        {
-            Position++;
-            return (byte)stream.ReadByte();
-        }
-
-        short IBinaryReader.S16()
-        {
-            return Read<short>();
-        }
-
-        ushort IBinaryReader.U16()
-        {
-            return Read<ushort>();
-        }
-
-        int IBinaryReader.S32()
-        {
-            return Read<int>();
-        }
-
-        uint IBinaryReader.U32()
-        {
-            return Read<uint>();
-        }
-
-        long IBinaryReader.S64()
-        {
-            return Read<long>();
-        }
-
-        ulong IBinaryReader.U64()
-        {
-            return Read<ulong>();
-        }
-
-        float IBinaryReader.F32()
-        {
-            return Read<float>();
-        }
-
-        double IBinaryReader.F64()
-        {
-            return Read<double>();
-        }
-#endregion
-
-#region Contiguous memory
         void IBinaryReader.Span(ref Span<byte> span)
         {
             var read = stream.Read(span);
@@ -298,7 +160,6 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
 
             return buffer;
         }
-#endregion
 
 #region Disposal
         void IDisposable.Dispose()
@@ -329,100 +190,15 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
     /// </summary>
     public BinaryReader<LittleEndian, SystemEndian> LittleEndian => new(this);
 
-#region Primitive types
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public sbyte S8()
+    public T Read<T>() where T : unmanaged
     {
-        AssertSize<sbyte>();
+        AssertSize<T>();
         {
-            return impl.S8();
+            return impl.Read<T>();
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public byte U8()
-    {
-        AssertSize<byte>();
-        {
-            return impl.U8();
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public short S16()
-    {
-        AssertSize<short>();
-        {
-            return impl.S16();
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ushort U16()
-    {
-        AssertSize<ushort>();
-        {
-            return impl.U16();
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int S32()
-    {
-        AssertSize<int>();
-        {
-            return impl.S32();
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public uint U32()
-    {
-        AssertSize<uint>();
-        {
-            return impl.U32();
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public long S64()
-    {
-        AssertSize<long>();
-        {
-            return impl.S64();
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ulong U64()
-    {
-        AssertSize<ulong>();
-        {
-            return impl.U64();
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public float F32()
-    {
-        AssertSize<float>();
-        {
-            return impl.F32();
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public double F64()
-    {
-        AssertSize<double>();
-        {
-            return impl.F64();
-        }
-    }
-#endregion
-
-#region Contiguous memory
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Span(ref Span<byte> span)
     {
         AssertSize(span.Length);
@@ -439,7 +215,6 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
             return impl.Array(length);
         }
     }
-#endregion
 
 #region Disposal
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -526,85 +301,11 @@ public readonly ref struct BinaryReader<TFromEndian, TToEndian>(BinaryReader rea
 
     public long Length => reader.Length;
 
-#region Primitive types
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public sbyte S8()
+    public T Read<T>() where T : unmanaged
     {
-        return reader.S8();
+        return reverse_bytes ? EndianHelper.ReverseEndianness(reader.Read<T>()) : reader.Read<T>();
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public byte U8()
-    {
-        return reader.U8();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public short S16()
-    {
-        var value = reader.S16();
-        {
-            return reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ushort U16()
-    {
-        var value = reader.U16();
-        {
-            return reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int S32()
-    {
-        var value = reader.S32();
-        {
-            return reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public uint U32()
-    {
-        var value = reader.U32();
-        {
-            return reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public long S64()
-    {
-        var value = reader.S64();
-        {
-            return reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ulong U64()
-    {
-        var value = reader.U64();
-        {
-            return reverse_bytes ? BinaryPrimitives.ReverseEndianness(value) : value;
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public float F32()
-    {
-        return reader.F32();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public double F64()
-    {
-        return reader.F64();
-    }
-#endregion
 
 #region Contiguous memory
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -642,7 +343,7 @@ public static class BinaryReaderExtensions
     public static bool BooleanWide<TReader>(this TReader @this)
         where TReader : struct, IBinaryReader
     {
-        var value = @this.U32();
+        var value = @this.Read<uint>();
         {
             // Boolean values should be '0' or '1'.  Technically, the only
             // requirement is that we treat zero as falsy and non-zero as
@@ -662,7 +363,7 @@ public static class BinaryReaderExtensions
     public static bool BooleanNarrow<TReader>(this TReader @this)
         where TReader : struct, IBinaryReader
     {
-        var value = @this.U8();
+        var value = @this.Read<uint>();
         {
             // Boolean values should be '0' or '1'.  Technically, the only
             // requirement is that we treat zero as falsy and non-zero as
