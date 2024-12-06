@@ -341,7 +341,7 @@ public static class BinaryReaderExtensions
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool BooleanWide<TReader>(this TReader @this)
-        where TReader : struct, IBinaryReader
+        where TReader : struct, IBinaryReader, allows ref struct
     {
         var value = @this.Read<uint>();
         {
@@ -361,9 +361,9 @@ public static class BinaryReaderExtensions
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool BooleanNarrow<TReader>(this TReader @this)
-        where TReader : struct, IBinaryReader
+        where TReader : struct, IBinaryReader, allows ref struct
     {
-        var value = @this.Read<uint>();
+        var value = @this.Read<byte>();
         {
             // Boolean values should be '0' or '1'.  Technically, the only
             // requirement is that we treat zero as falsy and non-zero as

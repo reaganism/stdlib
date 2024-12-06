@@ -313,7 +313,7 @@ public static class BinaryWriterExtensions
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void BooleanWide<TWriter>(this TWriter @this, bool value)
-        where TWriter : struct, IBinaryWriter
+        where TWriter : struct, IBinaryWriter, allows ref struct
     {
         @this.Write(value ? 1u : 0u);
     }
@@ -323,7 +323,7 @@ public static class BinaryWriterExtensions
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void BooleanNarrow<TWriter>(this TWriter @this, bool value)
-        where TWriter : struct, IBinaryWriter
+        where TWriter : struct, IBinaryWriter, allows ref struct
     {
         @this.Write(value ? (byte)1 : (byte)0);
     }

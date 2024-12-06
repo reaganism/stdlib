@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reaganism.IO", "Reaganism.IO\Reaganism.IO.csproj", "{FD876776-A809-48D1-863F-289ED06F530C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reaganism.Tests", "Reaganism.Tests\Reaganism.Tests.csproj", "{0257705A-F2C7-469A-B0A8-81F235F7C2E1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{FD876776-A809-48D1-863F-289ED06F530C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD876776-A809-48D1-863F-289ED06F530C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD876776-A809-48D1-863F-289ED06F530C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0257705A-F2C7-469A-B0A8-81F235F7C2E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0257705A-F2C7-469A-B0A8-81F235F7C2E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0257705A-F2C7-469A-B0A8-81F235F7C2E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0257705A-F2C7-469A-B0A8-81F235F7C2E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
