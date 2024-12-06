@@ -41,7 +41,7 @@ public class BinaryWriterBenchmarks
     public void CustomBinaryWriterWrite()
     {
         using var ms     = new MemoryStream();
-        using var writer = BinaryWriter.FromStream(ms);
+        using var writer = new BinaryWriter(ms, false);
 
         for (var i = 0; i < iterations; i++)
         {
@@ -56,7 +56,7 @@ public class BinaryWriterBenchmarks
     public void CustomBinaryWriterLeWrite()
     {
         using var ms     = new MemoryStream();
-        using var writer = BinaryWriter.FromStream(ms);
+        using var writer = new BinaryWriter(ms, false);
 
         for (var i = 0; i < iterations; i++)
         {
@@ -71,7 +71,7 @@ public class BinaryWriterBenchmarks
     public void CustomBinaryWriterBeWrite()
     {
         using var ms     = new MemoryStream();
-        using var writer = BinaryWriter.FromStream(ms);
+        using var writer = new BinaryWriter(ms, false);
 
         for (var i = 0; i < iterations; i++)
         {

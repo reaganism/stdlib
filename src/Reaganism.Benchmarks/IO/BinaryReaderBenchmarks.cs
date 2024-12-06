@@ -40,7 +40,7 @@ public class BinaryReaderBenchmarks
     [Benchmark]
     public void CustomBinaryReaderRead()
     {
-        using var reader = BinaryReader.FromByteArray(testData);
+        using var reader = new BinaryReader(new MemoryStream(testData), true);
 
         for (var i = 0; i < iterations; i++)
         {
@@ -54,7 +54,7 @@ public class BinaryReaderBenchmarks
     [Benchmark]
     public void CustomBinaryReaderLeRead()
     {
-        using var reader = BinaryReader.FromByteArray(testData);
+        using var reader = new BinaryReader(new MemoryStream(testData), true);
 
         for (var i = 0; i < iterations; i++)
         {
@@ -68,7 +68,7 @@ public class BinaryReaderBenchmarks
     [Benchmark]
     public void CustomBinaryReaderBeRead()
     {
-        using var reader = BinaryReader.FromByteArray(testData);
+        using var reader = new BinaryReader(new MemoryStream(testData), true);
 
         for (var i = 0; i < iterations; i++)
         {
