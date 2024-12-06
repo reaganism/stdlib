@@ -81,80 +81,12 @@ public readonly struct BinaryWriter(Stream stream, bool disposeStream) : IBinary
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public unsafe void Write<T>(T value) where T : unmanaged
     {
-        // Fast paths: manually write bytes for primitive types of known
-        // sizes.
-        if (typeof(T) == typeof(byte))
+        if (typeof(T) == typeof(byte) || typeof(T) == typeof(sbyte))
         {
-            stream.WriteByte((byte)(object)value);
+            stream.WriteByte(Unsafe.As<T, byte>(ref value));
             return;
         }
 
-        if (typeof(T) == typeof(sbyte))
-        {
-            stream.WriteByte((byte)(sbyte)(object)value);
-            return;
-        }
-
-        if (typeof(T) == typeof(short))
-        {
-            stream.WriteByte((byte)(short)(object)value);
-            stream.WriteByte((byte)((short)(object)value >> 0x8));
-            return;
-        }
-
-        if (typeof(T) == typeof(ushort))
-        {
-            stream.WriteByte((byte)(ushort)(object)value);
-            stream.WriteByte((byte)((ushort)(object)value >> 0x8));
-            return;
-        }
-
-        if (typeof(T) == typeof(int))
-        {
-            stream.WriteByte((byte)(int)(object)value);
-            stream.WriteByte((byte)((int)(object)value >> 0x8));
-            stream.WriteByte((byte)((int)(object)value >> 0x10));
-            stream.WriteByte((byte)((int)(object)value >> 0x18));
-            return;
-        }
-
-        if (typeof(T) == typeof(uint))
-        {
-            stream.WriteByte((byte)(uint)(object)value);
-            stream.WriteByte((byte)((uint)(object)value >> 0x8));
-            stream.WriteByte((byte)((uint)(object)value >> 0x10));
-            stream.WriteByte((byte)((uint)(object)value >> 0x18));
-            return;
-        }
-
-        if (typeof(T) == typeof(long))
-        {
-            stream.WriteByte((byte)(long)(object)value);
-            stream.WriteByte((byte)((long)(object)value >> 0x8));
-            stream.WriteByte((byte)((long)(object)value >> 0x10));
-            stream.WriteByte((byte)((long)(object)value >> 0x18));
-            stream.WriteByte((byte)((long)(object)value >> 0x20));
-            stream.WriteByte((byte)((long)(object)value >> 0x28));
-            stream.WriteByte((byte)((long)(object)value >> 0x30));
-            stream.WriteByte((byte)((long)(object)value >> 0x38));
-            return;
-        }
-
-        if (typeof(T) == typeof(ulong))
-        {
-            stream.WriteByte((byte)(ulong)(object)value);
-            stream.WriteByte((byte)((ulong)(object)value >> 0x8));
-            stream.WriteByte((byte)((ulong)(object)value >> 0x10));
-            stream.WriteByte((byte)((ulong)(object)value >> 0x18));
-            stream.WriteByte((byte)((ulong)(object)value >> 0x20));
-            stream.WriteByte((byte)((ulong)(object)value >> 0x28));
-            stream.WriteByte((byte)((ulong)(object)value >> 0x30));
-            stream.WriteByte((byte)((ulong)(object)value >> 0x38));
-            return;
-        }
-
-        // Slow path: write bytes for unknown types.  This is also the path
-        // used for floating-point types.
         Span<byte> bytes = stackalloc byte[sizeof(T)];
         Unsafe.WriteUnaligned(ref MemoryMarshal.GetReference(bytes), value);
         stream.Write(bytes);
