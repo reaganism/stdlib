@@ -34,7 +34,7 @@ public interface IBinaryReader : IDisposable
     ///     Reads a span of bytes from the data source.
     /// </summary>
     /// <param name="span">The span to write to.</param>
-    void Span(ref Span<byte> span);
+    void Span(Span<byte> span);
 
     /// <summary>
     ///     Reads an array of bytes from the data source.
@@ -73,13 +73,13 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
             return value;
         }
 
-        void IBinaryReader.Span(ref Span<byte> span)
+        void IBinaryReader.Span(Span<byte> span)
         {
             // TODO(large-files): We assert that the ending position is within the
             //                    bounds of a 32-bit signed integer.
             Debug.Assert(Position + span.Length <= int.MaxValue);
 
-            span     =  new Span<byte>(data, (int)Position, span.Length);
+            new ReadOnlySpan<byte>(data, (int)Position, span.Length).CopyTo(span);
             Position += span.Length;
         }
 
@@ -140,7 +140,7 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
             return Unsafe.As<byte, T>(ref buffer[0]);
         }
 
-        void IBinaryReader.Span(ref Span<byte> span)
+        void IBinaryReader.Span(Span<byte> span)
         {
             var read = stream.Read(span);
             {
@@ -199,11 +199,11 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
         }
     }
 
-    public void Span(ref Span<byte> span)
+    public void Span(Span<byte> span)
     {
         AssertSize(span.Length);
         {
-            impl.Span(ref span);
+            impl.Span(span);
         }
     }
 
@@ -309,9 +309,9 @@ public readonly ref struct BinaryReader<TFromEndian, TToEndian>(BinaryReader rea
 
 #region Contiguous memory
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Span(ref Span<byte> span)
+    public void Span(Span<byte> span)
     {
-        reader.Span(ref span);
+        reader.Span(span);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
