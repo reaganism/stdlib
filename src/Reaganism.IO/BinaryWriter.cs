@@ -88,7 +88,7 @@ public readonly struct BinaryWriter(Stream stream, bool disposeStream) : IBinary
         }
 
         Span<byte> bytes = stackalloc byte[sizeof(T)];
-        Unsafe.WriteUnaligned(ref MemoryMarshal.GetReference(bytes), value);
+        MemoryMarshal.Write(bytes, in value);
         stream.Write(bytes);
     }
 
