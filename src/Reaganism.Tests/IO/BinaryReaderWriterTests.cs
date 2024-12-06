@@ -15,7 +15,7 @@ public static class BinaryReaderWriterTests
     {
         var testData = CreateTestData();
 
-        using var reader = BinaryReader.FromByteArray(testData);
+        using var reader = new BinaryReader(new MemoryStream(testData), disposeStream: true);
 
         Assert.Multiple(
             () =>
@@ -30,7 +30,7 @@ public static class BinaryReaderWriterTests
     public static void TestBasicWrite()
     {
         using var memStream = new MemoryStream();
-        using var writer    = BinaryWriter.FromStream(memStream, disposeStream: true);
+        using var writer    = new BinaryWriter(memStream, disposeStream: true);
 
         writer.Be.Write(0x11223344u);
         writer.Le.Write(0x55667788u);
@@ -54,7 +54,7 @@ public static class BinaryReaderWriterTests
     {
         var testData = new byte[] { 0x12, 0x34, 0x56, 0x78 };
 
-        using var reader = BinaryReader.FromByteArray(testData);
+        using var reader = new BinaryReader(new MemoryStream(testData), true);
 
         Assert.That(reader.Le.Read<uint>(), Is.EqualTo(0x78563412u));
 
@@ -80,7 +80,7 @@ public static class BinaryReaderWriterTests
             0x00,
         };
 
-        using var reader = BinaryReader.FromByteArray(testData);
+        using var reader = new BinaryReader(new MemoryStream(testData), true);
 
         Assert.Multiple(
             () =>
@@ -101,7 +101,7 @@ public static class BinaryReaderWriterTests
     public static void TestBooleanWriting()
     {
         using var memStream = new MemoryStream();
-        using var writer    = BinaryWriter.FromStream(memStream, disposeStream: true);
+        using var writer    = new BinaryWriter(memStream, disposeStream: true);
 
         writer.Le.BooleanWide(true);
         writer.Le.BooleanWide(false);
@@ -139,7 +139,7 @@ public static class BinaryReaderWriterTests
     public static void TestSpanReading()
     {
         var       testData = CreateTestData();
-        using var reader   = BinaryReader.FromByteArray(testData);
+        using var reader   = new BinaryReader(new MemoryStream(testData), true);
 
         var buffer = new byte[4];
         reader.Span(buffer);
@@ -151,7 +151,7 @@ public static class BinaryReaderWriterTests
     public static void TestSpanWriting()
     {
         using var memStream = new MemoryStream();
-        using var writer    = BinaryWriter.FromStream(memStream, disposeStream: true);
+        using var writer    = new BinaryWriter(memStream, disposeStream: true);
 
         var data = new byte[] { 0xAA, 0xBB, 0xCC, 0xDD };
         writer.Span(data);
@@ -163,7 +163,7 @@ public static class BinaryReaderWriterTests
     public static void TestPositionAndLength()
     {
         var       testData = CreateTestData();
-        using var reader   = BinaryReader.FromByteArray(testData);
+        using var reader   = new BinaryReader(new MemoryStream(testData), true);
 
         Assert.Multiple(
             () =>

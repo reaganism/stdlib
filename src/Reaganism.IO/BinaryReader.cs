@@ -53,132 +53,15 @@ public interface IBinaryReader : IDisposable
 ///     Uses system endianness by default; use <see cref="Be"/> and
 ///     <see cref="Le"/> for explicit endianness.
 /// </remarks>
-public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
+public readonly unsafe struct BinaryReader(Stream stream, bool disposeStream) : IBinaryReader
 {
-    private sealed class Contiguous(byte[] data) : IBinaryReader
-    {
-        public long Position { get; set; }
-
-        long IBinaryReader.Length => data.Length;
-
-        T IBinaryReader.Read<T>()
-        {
-            if (typeof(T) == typeof(sbyte) || typeof(T) == typeof(byte))
-            {
-                return Unsafe.As<byte, T>(ref data[Position++]);
-            }
-
-            var value = Unsafe.As<byte, T>(ref data[Position]);
-            Position += sizeof(T);
-            return value;
-        }
-
-        void IBinaryReader.Span(Span<byte> span)
-        {
-            // TODO(large-files): We assert that the ending position is within the
-            //                    bounds of a 32-bit signed integer.
-            Debug.Assert(Position + span.Length <= int.MaxValue);
-
-            new ReadOnlySpan<byte>(data, (int)Position, span.Length).CopyTo(span);
-            Position += span.Length;
-        }
-
-        byte[] IBinaryReader.Array(int length)
-        {
-            // TODO(large-files): We assert that the ending position is within the
-            //                    bounds of a 32-bit signed integer.
-            Debug.Assert(Position + length <= int.MaxValue);
-
-            var array = new byte[length];
-            Buffer.BlockCopy(data, (int)Position, array, 0, length);
-            Position += length;
-            return array;
-        }
-
-#region Disposal
-        void IDisposable.Dispose()
-        {
-            // No implementation necessary, there is no data to dispose of.
-        }
-#endregion
-    }
-
-    private sealed class Streamed(Stream stream, bool disposeStream) : IBinaryReader
-    {
-        public long Position { get; set; }
-
-        long IBinaryReader.Length => stream.Length;
-
-        T IBinaryReader.Read<T>()
-        {
-            if (typeof(T) == typeof(sbyte) || typeof(T) == typeof(byte))
-            {
-                var b = stream.ReadByte();
-                {
-                    Debug.Assert(b != -1);
-                    b = (byte)b;
-                }
-
-                Position++;
-                return Unsafe.As<int, T>(ref b);
-            }
-
-            // TODO(perf): This isn't the most efficient approach.  We are
-            //             indeed taking advantage of streaming, but it may
-            //             prove more useful to read in chunks and interpret
-            //             that data.
-
-            var buffer = (Span<byte>)stackalloc byte[sizeof(T)];
-            {
-                var read = stream.Read(buffer);
-                {
-                    Debug.Assert(read == sizeof(T));
-                }
-            }
-
-            Position += sizeof(T);
-            return Unsafe.As<byte, T>(ref buffer[0]);
-        }
-
-        void IBinaryReader.Span(Span<byte> span)
-        {
-            var read = stream.Read(span);
-            {
-                Debug.Assert(read == span.Length);
-            }
-        }
-
-        byte[] IBinaryReader.Array(int length)
-        {
-            var buffer = new byte[length];
-            {
-                var read = stream.Read(buffer);
-                {
-                    Debug.Assert(read == length);
-                }
-            }
-
-            return buffer;
-        }
-
-#region Disposal
-        void IDisposable.Dispose()
-        {
-            if (disposeStream)
-            {
-                stream.Dispose();
-            }
-        }
-#endregion
-    }
-
     public long Position
     {
-        get => impl.Position;
-        set => impl.Position = value;
+        get => stream.Position;
+        set => stream.Position = value;
     }
 
-    public long Length => impl.Length;
+    public long Length => stream.Length;
 
     /// <summary>
     ///     Reads data in big-endian byte order.
@@ -195,7 +78,31 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
     {
         AssertSize<T>();
         {
-            return impl.Read<T>();
+            if (typeof(T) == typeof(sbyte) || typeof(T) == typeof(byte))
+            {
+                var b = stream.ReadByte();
+                {
+                    Debug.Assert(b != -1);
+                    b = (byte)b;
+                }
+
+                return Unsafe.As<int, T>(ref b);
+            }
+
+            // TODO(perf): This isn't the most efficient approach.  We are
+            //             indeed taking advantage of streaming, but it may
+            //             prove more useful to read in chunks and interpret
+            //             that data.
+
+            var buffer = (Span<byte>)stackalloc byte[sizeof(T)];
+            {
+                var read = stream.Read(buffer);
+                {
+                    Debug.Assert(read == sizeof(T));
+                }
+            }
+
+            return Unsafe.As<byte, T>(ref buffer[0]);
         }
     }
 
@@ -203,7 +110,10 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
     {
         AssertSize(span.Length);
         {
-            impl.Span(span);
+            var read = stream.Read(span);
+            {
+                Debug.Assert(read == span.Length);
+            }
         }
     }
 
@@ -212,7 +122,15 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
     {
         AssertSize(length);
         {
-            return impl.Array(length);
+            var buffer = new byte[length];
+            {
+                var read = stream.Read(buffer);
+                {
+                    Debug.Assert(read == length);
+                }
+            }
+
+            return buffer;
         }
     }
 
@@ -220,7 +138,10 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Dispose()
     {
-        impl.Dispose();
+        if (disposeStream)
+        {
+            stream.Dispose();
+        }
     }
 #endregion
 
@@ -247,31 +168,6 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
     private void AssertSize(int size)
     {
         Debug.Assert(Position >= 0 && Position + size <= Length);
-    }
-#endregion
-
-#region Construction
-    /// <summary>
-    ///     Constructs a binary reader from a byte array.
-    /// </summary>
-    /// <param name="bytes">The byte array to read from.</param>
-    /// <returns>The binary reader.</returns>
-    public static BinaryReader FromByteArray(byte[] bytes)
-    {
-        return new BinaryReader(new Contiguous(bytes));
-    }
-
-    /// <summary>
-    ///     Constructs a binary reader from a stream.
-    /// </summary>
-    /// <param name="stream">The stream to read from.</param>
-    /// <param name="disposeStream">
-    ///     Whether to dispose of the stream when the reader is disposed.
-    /// </param>
-    /// <returns>The binary reader.</returns>
-    public static BinaryReader FromStream(Stream stream, bool disposeStream)
-    {
-        return new BinaryReader(new Streamed(stream, disposeStream));
     }
 #endregion
 }
