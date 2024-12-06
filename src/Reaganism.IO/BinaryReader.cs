@@ -50,8 +50,8 @@ public interface IBinaryReader : IDisposable
 /// <remarks>
 ///     Wraps an <see cref="IBinaryReader"/> implementation.
 ///     <br />
-///     Uses system endianness by default; use <see cref="BigEndian"/> and
-///     <see cref="LittleEndian"/> for explicit endianness.
+///     Uses system endianness by default; use <see cref="Be"/> and
+///     <see cref="Le"/> for explicit endianness.
 /// </remarks>
 public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
 {
@@ -183,12 +183,12 @@ public readonly unsafe struct BinaryReader(IBinaryReader impl) : IBinaryReader
     /// <summary>
     ///     Reads data in big-endian byte order.
     /// </summary>
-    public BinaryReader<BigEndian, SystemEndian> BigEndian => new(this);
+    public BinaryReader<BigEndian, SystemEndian> Be => new(this);
 
     /// <summary>
     ///     Reads data in little-endian byte order.
     /// </summary>
-    public BinaryReader<LittleEndian, SystemEndian> LittleEndian => new(this);
+    public BinaryReader<LittleEndian, SystemEndian> Le => new(this);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Read<T>() where T : unmanaged

@@ -55,8 +55,8 @@ public interface IBinaryWriter : IDisposable
 /// <remarks>
 ///     Wraps an <see cref="IBinaryWriter"/> implementation.
 ///     <br />
-///     Uses system endianness by default; use <see cref="BigEndian"/> and
-///     <see cref="LittleEndian"/> for explicit endianness.
+///     Uses system endianness by default; use <see cref="Be"/> and
+///     <see cref="Le"/> for explicit endianness.
 /// </remarks>
 public readonly struct BinaryWriter(IBinaryWriter impl) : IBinaryWriter
 {
@@ -188,12 +188,12 @@ public readonly struct BinaryWriter(IBinaryWriter impl) : IBinaryWriter
     /// <summary>
     ///     Writes data in big-endian byte order.
     /// </summary>
-    public BinaryWriter<BigEndian, SystemEndian> BigEndian => new(this);
+    public BinaryWriter<BigEndian, SystemEndian> Be => new(this);
 
     /// <summary>
     ///     Writes data in little-endian byte order.
     /// </summary>
-    public BinaryWriter<LittleEndian, SystemEndian> LittleEndian => new(this);
+    public BinaryWriter<LittleEndian, SystemEndian> Le => new(this);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Write<T>(T value) where T : unmanaged
