@@ -83,10 +83,9 @@ public readonly unsafe struct BinaryReader(Stream stream, bool disposeStream) : 
                 var b = stream.ReadByte();
                 {
                     Debug.Assert(b != -1);
-                    b = (byte)b;
                 }
 
-                return Unsafe.As<int, T>(ref b);
+                return (T)(object)b;
             }
 
             // TODO(perf): This isn't the most efficient approach.  We are
