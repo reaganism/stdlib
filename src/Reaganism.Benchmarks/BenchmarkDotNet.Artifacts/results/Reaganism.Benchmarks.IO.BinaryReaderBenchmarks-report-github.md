@@ -10,7 +10,7 @@ AMD Ryzen 7 5700G with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
 ```
 | Method                   | Mean     | Error    | StdDev   | Ratio | RatioSD | Allocated | Alloc Ratio |
 |------------------------- |---------:|---------:|---------:|------:|--------:|----------:|------------:|
-| NetBinaryReaderRead      | 680.2 μs |  8.00 μs |  7.48 μs |  1.00 |    0.02 |     120 B |        1.00 |
-| CustomBinaryReaderRead   | 860.1 μs |  7.60 μs |  6.74 μs |  1.26 |    0.02 |      64 B |        0.53 |
-| CustomBinaryReaderLeRead | 895.2 μs | 17.71 μs | 15.70 μs |  1.32 |    0.03 |      64 B |        0.53 |
-| CustomBinaryReaderBeRead | 905.6 μs |  7.42 μs |  7.28 μs |  1.33 |    0.02 |      64 B |        0.53 |
+| NetBinaryReaderRead      | 681.6 μs | 10.32 μs |  9.65 μs |  1.00 |    0.02 |     120 B |        1.00 |
+| CustomBinaryReaderRead   | 865.8 μs | 17.17 μs | 19.78 μs |  1.27 |    0.03 |      64 B |        0.53 |
+| CustomBinaryReaderLeRead | 875.4 μs |  2.37 μs |  1.98 μs |  1.28 |    0.02 |      64 B |        0.53 |
+| CustomBinaryReaderBeRead | 883.8 μs | 17.03 μs | 15.93 μs |  1.30 |    0.03 |      64 B |        0.53 |
