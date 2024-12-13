@@ -4,11 +4,10 @@
         <TargetFramework>net9.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Reaganism.Internal\Reaganism.Internal.csproj" Private="true"/>
+        <ProjectReference Include="..\Reaganism.Internal.IL\Reaganism.Internal.IL.ilproj"/>
     </ItemGroup>
 
 </Project>

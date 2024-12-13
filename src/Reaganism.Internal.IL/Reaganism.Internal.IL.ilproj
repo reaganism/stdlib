@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.IL/9.0.0">
+
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <Platform>AnyCPU</Platform>
+        <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+        <MicrosoftNetCoreIlasmPackageVersion>9.0.0</MicrosoftNetCoreIlasmPackageVersion>
+        <IlasmFlags>$(IlasmFlags)</IlasmFlags>
+    </PropertyGroup>
+
+</Project>

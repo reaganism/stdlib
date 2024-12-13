@@ -1,8 +1,8 @@
 using System;
-using System.Buffers.Binary;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Reaganism.IO;
 
@@ -73,6 +73,8 @@ public readonly unsafe struct BinaryReader(Stream stream, bool disposeStream) : 
     /// </summary>
     public BinaryReader<LittleEndian, SystemEndian> Le => new(this);
 
+    private readonly bool isMemoryStream = stream is MemoryStream;
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Read<T>() where T : unmanaged
     {
@@ -84,24 +86,11 @@ public readonly unsafe struct BinaryReader(Stream stream, bool disposeStream) : 
                 {
                     Debug.Assert(b != -1);
                 }
-
+            
                 return (T)(object)b;
             }
 
-            // TODO(perf): This isn't the most efficient approach.  We are
-            //             indeed taking advantage of streaming, but it may
-            //             prove more useful to read in chunks and interpret
-            //             that data.
-
-            var buffer = (Span<byte>)stackalloc byte[sizeof(T)];
-            {
-                var read = stream.Read(buffer);
-                {
-                    Debug.Assert(read == sizeof(T));
-                }
-            }
-
-            return Unsafe.As<byte, T>(ref buffer[0]);
+            return MemoryMarshal.Read<T>(InternalRead(stackalloc byte[sizeof(T)]));
         }
     }
 
@@ -109,10 +98,7 @@ public readonly unsafe struct BinaryReader(Stream stream, bool disposeStream) : 
     {
         AssertSize(span.Length);
         {
-            var read = stream.Read(span);
-            {
-                Debug.Assert(read == span.Length);
-            }
+            stream.ReadExactly(span);
         }
     }
 
@@ -122,13 +108,7 @@ public readonly unsafe struct BinaryReader(Stream stream, bool disposeStream) : 
         AssertSize(length);
         {
             var buffer = new byte[length];
-            {
-                var read = stream.Read(buffer);
-                {
-                    Debug.Assert(read == length);
-                }
-            }
-
+            stream.ReadExactly(buffer, 0, length);
             return buffer;
         }
     }
@@ -169,6 +149,17 @@ public readonly unsafe struct BinaryReader(Stream stream, bool disposeStream) : 
         Debug.Assert(Position >= 0 && Position + size <= Length);
     }
 #endregion
+
+    private ReadOnlySpan<byte> InternalRead(Span<byte> buffer)
+    {
+        if (isMemoryStream)
+        {
+            return Internal.IL.MemoryStreamAccess.InternalReadSpan(Unsafe.As<MemoryStream>(stream), buffer.Length);
+        }
+
+        stream.ReadExactly(buffer);
+        return buffer;
+    }
 }
 
 /// <summary>

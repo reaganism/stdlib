@@ -40,11 +40,12 @@ public class BinaryReaderBenchmarks
     [Benchmark]
     public void CustomBinaryReaderRead()
     {
-        using var reader = new BinaryReader(new MemoryStream(testData), true);
+        using var ms     = new MemoryStream(testData);
+        using var reader = new BinaryReader(ms, true);
 
         for (var i = 0; i < iterations; i++)
         {
-            reader.Position = 0;
+            ms.Position = 0;
             reader.Read<int>();
             reader.Read<ulong>();
             reader.Read<double>();
@@ -54,11 +55,12 @@ public class BinaryReaderBenchmarks
     [Benchmark]
     public void CustomBinaryReaderLeRead()
     {
-        using var reader = new BinaryReader(new MemoryStream(testData), true);
+        using var ms     = new MemoryStream(testData);
+        using var reader = new BinaryReader(ms, true);
 
         for (var i = 0; i < iterations; i++)
         {
-            reader.Position = 0;
+            ms.Position = 0;
             reader.Le.Read<int>();
             reader.Le.Read<ulong>();
             reader.Le.Read<double>();
@@ -68,11 +70,12 @@ public class BinaryReaderBenchmarks
     [Benchmark]
     public void CustomBinaryReaderBeRead()
     {
-        using var reader = new BinaryReader(new MemoryStream(testData), true);
+        using var ms     = new MemoryStream(testData);
+        using var reader = new BinaryReader(ms, true);
 
         for (var i = 0; i < iterations; i++)
         {
-            reader.Position = 0;
+            ms.Position = 0;
             reader.Be.Read<int>();
             reader.Be.Read<ulong>();
             reader.Be.Read<double>();

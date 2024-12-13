@@ -1,0 +1,346 @@
+// Validating benchmarks:
+// ***** BenchmarkRunner: Start   *****
+// ***** Found 4 benchmark(s) in total *****
+// ***** Building 1 exe(s) in Parallel: Start   *****
+// start dotnet  restore /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true /p:IntermediateOutputPath="C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\obj\Release\net9.0/" /p:OutDir="C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\bin\Release\net9.0/" /p:OutputPath="C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\bin\Release\net9.0/" in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a
+// command took 1.01 sec and exited with 0
+// start dotnet  build -c Release --no-restore /p:UseSharedCompilation=false /p:BuildInParallel=false /m:1 /p:Deterministic=true /p:Optimize=true /p:IntermediateOutputPath="C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\obj\Release\net9.0/" /p:OutDir="C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\bin\Release\net9.0/" /p:OutputPath="C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\bin\Release\net9.0/" --output "C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\bin\Release\net9.0/" in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a
+// command took 6 sec and exited with 0
+// ***** Done, took 00:00:07 (7.06 sec)   *****
+// Found 4 benchmarks:
+//   BinaryReaderBenchmarks.NetBinaryReaderRead: DefaultJob
+//   BinaryReaderBenchmarks.CustomBinaryReaderRead: DefaultJob
+//   BinaryReaderBenchmarks.CustomBinaryReaderLeRead: DefaultJob
+//   BinaryReaderBenchmarks.CustomBinaryReaderBeRead: DefaultJob
+
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: BinaryReaderBenchmarks.NetBinaryReaderRead: DefaultJob
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 2f448022-8ce8-4769-972e-67782901ae0a.dll --anonymousPipes 1392 1412 --benchmarkName Reaganism.Benchmarks.IO.BinaryReaderBenchmarks.NetBinaryReaderRead --job Default --benchmarkId 0 in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\bin\Release\net9.0
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.14.0
+// Runtime=.NET 9.0.0 (9.0.24.52809), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: DefaultJob
+
+OverheadJitting  1: 1 op, 167200.00 ns, 167.2000 us/op
+WorkloadJitting  1: 1 op, 4268800.00 ns, 4.2688 ms/op
+
+OverheadJitting  2: 16 op, 240600.00 ns, 15.0375 us/op
+WorkloadJitting  2: 16 op, 22544900.00 ns, 1.4091 ms/op
+
+WorkloadPilot    1: 16 op, 22280700.00 ns, 1.3925 ms/op
+WorkloadPilot    2: 32 op, 45459900.00 ns, 1.4206 ms/op
+WorkloadPilot    3: 64 op, 90009400.00 ns, 1.4064 ms/op
+WorkloadPilot    4: 128 op, 123385500.00 ns, 963.9492 us/op
+WorkloadPilot    5: 256 op, 190381000.00 ns, 743.6758 us/op
+WorkloadPilot    6: 512 op, 349879900.00 ns, 683.3592 us/op
+WorkloadPilot    7: 1024 op, 715472800.00 ns, 698.7039 us/op
+
+OverheadWarmup   1: 1024 op, 3400.00 ns, 3.3203 ns/op
+OverheadWarmup   2: 1024 op, 2100.00 ns, 2.0508 ns/op
+OverheadWarmup   3: 1024 op, 2100.00 ns, 2.0508 ns/op
+OverheadWarmup   4: 1024 op, 2200.00 ns, 2.1484 ns/op
+OverheadWarmup   5: 1024 op, 2400.00 ns, 2.3438 ns/op
+OverheadWarmup   6: 1024 op, 2300.00 ns, 2.2461 ns/op
+OverheadWarmup   7: 1024 op, 2100.00 ns, 2.0508 ns/op
+OverheadWarmup   8: 1024 op, 2200.00 ns, 2.1484 ns/op
+
+OverheadActual   1: 1024 op, 1900.00 ns, 1.8555 ns/op
+OverheadActual   2: 1024 op, 1900.00 ns, 1.8555 ns/op
+OverheadActual   3: 1024 op, 2000.00 ns, 1.9531 ns/op
+OverheadActual   4: 1024 op, 2500.00 ns, 2.4414 ns/op
+OverheadActual   5: 1024 op, 2500.00 ns, 2.4414 ns/op
+OverheadActual   6: 1024 op, 1800.00 ns, 1.7578 ns/op
+OverheadActual   7: 1024 op, 1800.00 ns, 1.7578 ns/op
+OverheadActual   8: 1024 op, 1800.00 ns, 1.7578 ns/op
+OverheadActual   9: 1024 op, 1800.00 ns, 1.7578 ns/op
+OverheadActual  10: 1024 op, 1800.00 ns, 1.7578 ns/op
+OverheadActual  11: 1024 op, 2000.00 ns, 1.9531 ns/op
+OverheadActual  12: 1024 op, 2700.00 ns, 2.6367 ns/op
+OverheadActual  13: 1024 op, 2000.00 ns, 1.9531 ns/op
+OverheadActual  14: 1024 op, 2000.00 ns, 1.9531 ns/op
+OverheadActual  15: 1024 op, 2000.00 ns, 1.9531 ns/op
+OverheadActual  16: 1024 op, 1900.00 ns, 1.8555 ns/op
+OverheadActual  17: 1024 op, 1900.00 ns, 1.8555 ns/op
+OverheadActual  18: 1024 op, 2900.00 ns, 2.8320 ns/op
+OverheadActual  19: 1024 op, 2000.00 ns, 1.9531 ns/op
+
+WorkloadWarmup   1: 1024 op, 734977200.00 ns, 717.7512 us/op
+WorkloadWarmup   2: 1024 op, 725717600.00 ns, 708.7086 us/op
+WorkloadWarmup   3: 1024 op, 739278700.00 ns, 721.9519 us/op
+WorkloadWarmup   4: 1024 op, 713167100.00 ns, 696.4522 us/op
+WorkloadWarmup   5: 1024 op, 696744400.00 ns, 680.4145 us/op
+WorkloadWarmup   6: 1024 op, 710580300.00 ns, 693.9261 us/op
+WorkloadWarmup   7: 1024 op, 718759900.00 ns, 701.9140 us/op
+WorkloadWarmup   8: 1024 op, 694724100.00 ns, 678.4415 us/op
+
+// BeforeActualRun
+WorkloadActual   1: 1024 op, 712712200.00 ns, 696.0080 us/op
+WorkloadActual   2: 1024 op, 706308500.00 ns, 689.7544 us/op
+WorkloadActual   3: 1024 op, 716117700.00 ns, 699.3337 us/op
+WorkloadActual   4: 1024 op, 731316000.00 ns, 714.1758 us/op
+WorkloadActual   5: 1024 op, 741504400.00 ns, 724.1254 us/op
+WorkloadActual   6: 1024 op, 716945600.00 ns, 700.1422 us/op
+WorkloadActual   7: 1024 op, 721303000.00 ns, 704.3975 us/op
+WorkloadActual   8: 1024 op, 735547800.00 ns, 718.3084 us/op
+WorkloadActual   9: 1024 op, 721862000.00 ns, 704.9434 us/op
+WorkloadActual  10: 1024 op, 742947200.00 ns, 725.5344 us/op
+WorkloadActual  11: 1024 op, 809298400.00 ns, 790.3305 us/op
+WorkloadActual  12: 1024 op, 742682300.00 ns, 725.2757 us/op
+WorkloadActual  13: 1024 op, 746216500.00 ns, 728.7271 us/op
+WorkloadActual  14: 1024 op, 808116400.00 ns, 789.1762 us/op
+WorkloadActual  15: 1024 op, 722141800.00 ns, 705.2166 us/op
+WorkloadActual  16: 1024 op, 749473700.00 ns, 731.9079 us/op
+WorkloadActual  17: 1024 op, 712146500.00 ns, 695.4556 us/op
+WorkloadActual  18: 1024 op, 708777100.00 ns, 692.1651 us/op
+WorkloadActual  19: 1024 op, 723942700.00 ns, 706.9753 us/op
+
+// AfterActualRun
+WorkloadResult   1: 1024 op, 712710200.00 ns, 696.0061 us/op
+WorkloadResult   2: 1024 op, 706306500.00 ns, 689.7524 us/op
+WorkloadResult   3: 1024 op, 716115700.00 ns, 699.3317 us/op
+WorkloadResult   4: 1024 op, 731314000.00 ns, 714.1738 us/op
+WorkloadResult   5: 1024 op, 741502400.00 ns, 724.1234 us/op
+WorkloadResult   6: 1024 op, 716943600.00 ns, 700.1402 us/op
+WorkloadResult   7: 1024 op, 721301000.00 ns, 704.3955 us/op
+WorkloadResult   8: 1024 op, 735545800.00 ns, 718.3064 us/op
+WorkloadResult   9: 1024 op, 721860000.00 ns, 704.9414 us/op
+WorkloadResult  10: 1024 op, 742945200.00 ns, 725.5324 us/op
+WorkloadResult  11: 1024 op, 742680300.00 ns, 725.2737 us/op
+WorkloadResult  12: 1024 op, 746214500.00 ns, 728.7251 us/op
+WorkloadResult  13: 1024 op, 722139800.00 ns, 705.2146 us/op
+WorkloadResult  14: 1024 op, 749471700.00 ns, 731.9060 us/op
+WorkloadResult  15: 1024 op, 712144500.00 ns, 695.4536 us/op
+WorkloadResult  16: 1024 op, 708775100.00 ns, 692.1632 us/op
+WorkloadResult  17: 1024 op, 723940700.00 ns, 706.9733 us/op
+// GC:  0 0 0 122992 1024
+// Threading:  0 0 1024
+
+// AfterAll
+// Benchmark Process 5480 has exited with code 0.
+
+Mean = 709.554 μs, StdErr = 3.334 μs (0.47%), N = 17, StdDev = 13.746 μs
+Min = 689.752 μs, Q1 = 699.332 μs, Median = 705.215 μs, Q3 = 724.123 μs, Max = 731.906 μs
+IQR = 24.792 μs, LowerFence = 662.144 μs, UpperFence = 761.311 μs
+ConfidenceInterval = [696.168 μs; 722.939 μs] (CI 99.9%), Margin = 13.385 μs (1.89% of Mean)
+Skewness = 0.21, Kurtosis = 1.48, MValue = 2
+
+// ** Remained 3 (75.0%) benchmark(s) to run. Estimated finish 2024-12-05 23:06 (0h 1m from now) **
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: BinaryReaderBenchmarks.CustomBinaryReaderRead: DefaultJob
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 2f448022-8ce8-4769-972e-67782901ae0a.dll --anonymousPipes 1504 1356 --benchmarkName Reaganism.Benchmarks.IO.BinaryReaderBenchmarks.CustomBinaryReaderRead --job Default --benchmarkId 1 in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\bin\Release\net9.0
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.14.0
+// Runtime=.NET 9.0.0 (9.0.24.52809), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: DefaultJob
+
+OverheadJitting  1: 1 op, 150400.00 ns, 150.4000 us/op
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> System.BadImageFormatException: Invalid usage of UnsafeAccessorAttribute.
+   at Reaganism.IO.BinaryReader.GetBuffer(MemoryStream this)
+   at Reaganism.IO.BinaryReader.InternalReadSpan(Stream stream, Int32 count) in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.IO\BinaryReader.cs:line 174
+   at Reaganism.IO.BinaryReader.InternalRead(Span`1 buffer, Stream stream, Boolean isMemoryStream) in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.IO\BinaryReader.cs:line 156
+   at Reaganism.Benchmarks.IO.BinaryReaderBenchmarks.CustomBinaryReaderRead() in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\IO\BinaryReaderBenchmarks.cs:line 48
+   at BenchmarkDotNet.Autogenerated.Runnable_1.WorkloadActionNoUnroll(Int64 invokeCount) in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\2f448022-8ce8-4769-972e-67782901ae0a.notcs:line 503
+   at BenchmarkDotNet.Engines.Engine.Measure(Action`1 action, Int64 invokeCount)
+   at BenchmarkDotNet.Engines.Engine.RunIteration(IterationData data)
+   at BenchmarkDotNet.Engines.EngineFactory.Jit(Engine engine, Int32 jitIndex, Int32 invokeCount, Int32 unrollFactor)
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_1.Run(IHost host, String benchmarkName) in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\2f448022-8ce8-4769-972e-67782901ae0a.notcs:line 368
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+   --- End of inner exception stack trace ---
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\2f448022-8ce8-4769-972e-67782901ae0a.notcs:line 57
+// AfterAll
+No Workload Results were obtained from the run.
+// Benchmark Process 34280 has exited with code -1.
+
+// ** Remained 2 (50.0%) benchmark(s) to run. Estimated finish 2024-12-05 23:06 (0h 0m from now) **
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: BinaryReaderBenchmarks.CustomBinaryReaderLeRead: DefaultJob
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 2f448022-8ce8-4769-972e-67782901ae0a.dll --anonymousPipes 1344 1492 --benchmarkName Reaganism.Benchmarks.IO.BinaryReaderBenchmarks.CustomBinaryReaderLeRead --job Default --benchmarkId 2 in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\bin\Release\net9.0
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.14.0
+// Runtime=.NET 9.0.0 (9.0.24.52809), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: DefaultJob
+
+OverheadJitting  1: 1 op, 164200.00 ns, 164.2000 us/op
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> System.BadImageFormatException: Invalid usage of UnsafeAccessorAttribute.
+   at Reaganism.IO.BinaryReader.GetBuffer(MemoryStream this)
+   at Reaganism.IO.BinaryReader.InternalReadSpan(Stream stream, Int32 count) in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.IO\BinaryReader.cs:line 174
+   at Reaganism.IO.BinaryReader.InternalRead(Span`1 buffer, Stream stream, Boolean isMemoryStream) in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.IO\BinaryReader.cs:line 156
+   at Reaganism.Benchmarks.IO.BinaryReaderBenchmarks.CustomBinaryReaderLeRead() in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\IO\BinaryReaderBenchmarks.cs:line 62
+   at BenchmarkDotNet.Autogenerated.Runnable_2.WorkloadActionNoUnroll(Int64 invokeCount) in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\2f448022-8ce8-4769-972e-67782901ae0a.notcs:line 695
+   at BenchmarkDotNet.Engines.Engine.Measure(Action`1 action, Int64 invokeCount)
+   at BenchmarkDotNet.Engines.Engine.RunIteration(IterationData data)
+   at BenchmarkDotNet.Engines.EngineFactory.Jit(Engine engine, Int32 jitIndex, Int32 invokeCount, Int32 unrollFactor)
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_2.Run(IHost host, String benchmarkName) in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\2f448022-8ce8-4769-972e-67782901ae0a.notcs:line 560
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+   --- End of inner exception stack trace ---
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\2f448022-8ce8-4769-972e-67782901ae0a.notcs:line 57
+// AfterAll
+No Workload Results were obtained from the run.
+// Benchmark Process 29320 has exited with code -1.
+
+// ** Remained 1 (25.0%) benchmark(s) to run. Estimated finish 2024-12-05 23:06 (0h 0m from now) **
+Setup power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// **************************
+// Benchmark: BinaryReaderBenchmarks.CustomBinaryReaderBeRead: DefaultJob
+// *** Execute ***
+// Launch: 1 / 1
+// Execute: dotnet 2f448022-8ce8-4769-972e-67782901ae0a.dll --anonymousPipes 1420 1424 --benchmarkName Reaganism.Benchmarks.IO.BinaryReaderBenchmarks.CustomBinaryReaderBeRead --job Default --benchmarkId 3 in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\bin\Release\net9.0
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// BenchmarkDotNet v0.14.0
+// Runtime=.NET 9.0.0 (9.0.24.52809), X64 RyuJIT AVX2
+// GC=Concurrent Workstation
+// HardwareIntrinsics=AVX2,AES,BMI1,BMI2,FMA,LZCNT,PCLMUL,POPCNT VectorSize=256
+// Job: DefaultJob
+
+OverheadJitting  1: 1 op, 155800.00 ns, 155.8000 us/op
+
+System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation.
+ ---> System.BadImageFormatException: Invalid usage of UnsafeAccessorAttribute.
+   at Reaganism.IO.BinaryReader.GetBuffer(MemoryStream this)
+   at Reaganism.IO.BinaryReader.InternalReadSpan(Stream stream, Int32 count) in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.IO\BinaryReader.cs:line 174
+   at Reaganism.IO.BinaryReader.InternalRead(Span`1 buffer, Stream stream, Boolean isMemoryStream) in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.IO\BinaryReader.cs:line 156
+   at Reaganism.Benchmarks.IO.BinaryReaderBenchmarks.CustomBinaryReaderBeRead() in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\IO\BinaryReaderBenchmarks.cs:line 76
+   at BenchmarkDotNet.Autogenerated.Runnable_3.WorkloadActionNoUnroll(Int64 invokeCount) in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\2f448022-8ce8-4769-972e-67782901ae0a.notcs:line 887
+   at BenchmarkDotNet.Engines.Engine.Measure(Action`1 action, Int64 invokeCount)
+   at BenchmarkDotNet.Engines.Engine.RunIteration(IterationData data)
+   at BenchmarkDotNet.Engines.EngineFactory.Jit(Engine engine, Int32 jitIndex, Int32 invokeCount, Int32 unrollFactor)
+   at BenchmarkDotNet.Engines.EngineFactory.CreateReadyToRun(EngineParameters engineParameters)
+   at BenchmarkDotNet.Autogenerated.Runnable_3.Run(IHost host, String benchmarkName) in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\2f448022-8ce8-4769-972e-67782901ae0a.notcs:line 752
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+   --- End of inner exception stack trace ---
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)
+   at BenchmarkDotNet.Autogenerated.UniqueProgramName.AfterAssemblyLoadingAttached(String[] args) in C:\Users\stephen\Documents\GitHub\stdlib\src\Reaganism.Benchmarks\bin\Release\net9.0\2f448022-8ce8-4769-972e-67782901ae0a\2f448022-8ce8-4769-972e-67782901ae0a.notcs:line 57
+// AfterAll
+No Workload Results were obtained from the run.
+// Benchmark Process 17756 has exited with code -1.
+
+// ** Remained 0 (0.0%) benchmark(s) to run. Estimated finish 2024-12-05 23:05 (0h 0m from now) **
+Successfully reverted power plan (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c FriendlyName: High performance)
+// ***** BenchmarkRunner: Finish  *****
+
+// * Export *
+  BenchmarkDotNet.Artifacts\results\Reaganism.Benchmarks.IO.BinaryReaderBenchmarks-report.csv
+  BenchmarkDotNet.Artifacts\results\Reaganism.Benchmarks.IO.BinaryReaderBenchmarks-report-github.md
+  BenchmarkDotNet.Artifacts\results\Reaganism.Benchmarks.IO.BinaryReaderBenchmarks-report.html
+
+// * Detailed results *
+BinaryReaderBenchmarks.NetBinaryReaderRead: DefaultJob
+Runtime = .NET 9.0.0 (9.0.24.52809), X64 RyuJIT AVX2; GC = Concurrent Workstation
+Mean = 709.554 μs, StdErr = 3.334 μs (0.47%), N = 17, StdDev = 13.746 μs
+Min = 689.752 μs, Q1 = 699.332 μs, Median = 705.215 μs, Q3 = 724.123 μs, Max = 731.906 μs
+IQR = 24.792 μs, LowerFence = 662.144 μs, UpperFence = 761.311 μs
+ConfidenceInterval = [696.168 μs; 722.939 μs] (CI 99.9%), Margin = 13.385 μs (1.89% of Mean)
+Skewness = 0.21, Kurtosis = 1.48, MValue = 2
+-------------------- Histogram --------------------
+[682.736 μs ; 708.230 μs) | @@@@@@@@@@
+[708.230 μs ; 732.357 μs) | @@@@@@@
+---------------------------------------------------
+
+BinaryReaderBenchmarks.CustomBinaryReaderRead: DefaultJob
+Runtime = .NET 9.0.0 (9.0.24.52809), X64 RyuJIT AVX2; GC = Concurrent Workstation
+There are not any results runs
+
+BinaryReaderBenchmarks.CustomBinaryReaderLeRead: DefaultJob
+Runtime = .NET 9.0.0 (9.0.24.52809), X64 RyuJIT AVX2; GC = Concurrent Workstation
+There are not any results runs
+
+BinaryReaderBenchmarks.CustomBinaryReaderBeRead: DefaultJob
+Runtime = .NET 9.0.0 (9.0.24.52809), X64 RyuJIT AVX2; GC = Concurrent Workstation
+There are not any results runs
+
+// * Summary *
+
+BenchmarkDotNet v0.14.0, Windows 11 (10.0.22631.4460/23H2/2023Update/SunValley3)
+AMD Ryzen 7 5700G with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
+.NET SDK 9.0.100
+  [Host]     : .NET 9.0.0 (9.0.24.52809), X64 RyuJIT AVX2
+  DefaultJob : .NET 9.0.0 (9.0.24.52809), X64 RyuJIT AVX2
+
+
+| Method                   | Mean     | Error    | StdDev   | Ratio | RatioSD | Allocated | Alloc Ratio |
+|------------------------- |---------:|---------:|---------:|------:|--------:|----------:|------------:|
+| NetBinaryReaderRead      | 709.6 μs | 13.39 μs | 13.75 μs |  1.00 |    0.03 |     120 B |        1.00 |
+| CustomBinaryReaderRead   |       NA |       NA |       NA |     ? |       ? |        NA |           ? |
+| CustomBinaryReaderLeRead |       NA |       NA |       NA |     ? |       ? |        NA |           ? |
+| CustomBinaryReaderBeRead |       NA |       NA |       NA |     ? |       ? |        NA |           ? |
+
+Benchmarks with issues:
+  BinaryReaderBenchmarks.CustomBinaryReaderRead: DefaultJob
+  BinaryReaderBenchmarks.CustomBinaryReaderLeRead: DefaultJob
+  BinaryReaderBenchmarks.CustomBinaryReaderBeRead: DefaultJob
+
+// * Warnings *
+Environment
+  Summary -> Detected error exit code from one of the benchmarks. It might be caused by following antivirus software:
+        - Windows Defender (windowsdefender://)
+Use InProcessEmitToolchain or InProcessNoEmitToolchain to avoid new process creation.
+
+BaselineCustomAnalyzer
+  Summary -> A question mark '?' symbol indicates that it was not possible to compute the (Ratio, RatioSD, Alloc Ratio) column(s) because the baseline value is too close to zero.
+
+// * Hints *
+Outliers
+  BinaryReaderBenchmarks.NetBinaryReaderRead: Default -> 2 outliers were removed (789.18 μs, 790.33 μs)
+
+// * Legends *
+  Mean        : Arithmetic mean of all measurements
+  Error       : Half of 99.9% confidence interval
+  StdDev      : Standard deviation of all measurements
+  Ratio       : Mean of the ratio distribution ([Current]/[Baseline])
+  RatioSD     : Standard deviation of the ratio distribution ([Current]/[Baseline])
+  Allocated   : Allocated memory per single operation (managed only, inclusive, 1KB = 1024B)
+  Alloc Ratio : Allocated memory ratio distribution ([Current]/[Baseline])
+  1 μs        : 1 Microsecond (0.000001 sec)
+
+// * Diagnostic Output - MemoryDiagnoser *
+
+
+// ***** BenchmarkRunner: End *****
+Run time: 00:00:22 (22.9 sec), executed benchmarks: 4
+
+Global total time: 00:00:30 (30.15 sec), executed benchmarks: 4
+// * Artifacts cleanup *
+Artifacts cleanup is finished

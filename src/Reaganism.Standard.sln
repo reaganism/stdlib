@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reaganism.Tests", "Reaganis
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reaganism.Benchmarks", "Reaganism.Benchmarks\Reaganism.Benchmarks.csproj", "{AEE14E5F-49C5-4547-B4B7-69A9C3EE3351}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reaganism.Internal", "Reaganism.Internal\Reaganism.Internal.csproj", "{695D1AE1-8C1E-4E6A-94D2-E193191E4E61}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reaganism.Internal.IL", "Reaganism.Internal.IL\Reaganism.Internal.IL.ilproj", "{84241B14-54A2-469A-B4E9-C3229BEC35FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +34,13 @@ Global
 		{AEE14E5F-49C5-4547-B4B7-69A9C3EE3351}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEE14E5F-49C5-4547-B4B7-69A9C3EE3351}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AEE14E5F-49C5-4547-B4B7-69A9C3EE3351}.Release|Any CPU.Build.0 = Release|Any CPU
+		{695D1AE1-8C1E-4E6A-94D2-E193191E4E61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{695D1AE1-8C1E-4E6A-94D2-E193191E4E61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{695D1AE1-8C1E-4E6A-94D2-E193191E4E61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{695D1AE1-8C1E-4E6A-94D2-E193191E4E61}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84241B14-54A2-469A-B4E9-C3229BEC35FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84241B14-54A2-469A-B4E9-C3229BEC35FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84241B14-54A2-469A-B4E9-C3229BEC35FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84241B14-54A2-469A-B4E9-C3229BEC35FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
