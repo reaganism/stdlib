@@ -80,14 +80,14 @@ public readonly unsafe struct BinaryReader(Stream stream, bool disposeStream) : 
     {
         AssertSize<T>();
         {
-            if (typeof(T) == typeof(sbyte) || typeof(T) == typeof(byte))
+            if (typeof(T) == typeof(byte) || typeof(T) == typeof(sbyte))
             {
                 var b = stream.ReadByte();
                 {
                     Debug.Assert(b != -1);
                 }
-            
-                return (T)(object)b;
+
+                return Unsafe.As<int, T>(ref b);
             }
 
             return MemoryMarshal.Read<T>(InternalRead(stackalloc byte[sizeof(T)]));
@@ -154,7 +154,7 @@ public readonly unsafe struct BinaryReader(Stream stream, bool disposeStream) : 
     {
         if (isMemoryStream)
         {
-            return Internal.IL.MemoryStreamAccess.InternalReadSpan(Unsafe.As<MemoryStream>(stream), buffer.Length);
+            return Internal.MemoryStreamAccess.InternalReadSpan(Unsafe.As<MemoryStream>(stream), buffer.Length);
         }
 
         stream.ReadExactly(buffer);

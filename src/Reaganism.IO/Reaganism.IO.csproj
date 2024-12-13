@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Reaganism.Internal\Reaganism.Internal.csproj" Private="true"/>
+        <ProjectReference Include="..\Reaganism.Internal\Reaganism.Internal.csproj" PrivateAssets="compile"/>
     </ItemGroup>
 
 </Project>
