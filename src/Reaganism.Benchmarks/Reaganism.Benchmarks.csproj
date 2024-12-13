@@ -13,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Reaganism.IO.Hashing\Reaganism.IO.Hashing.csproj"/>
         <ProjectReference Include="..\Reaganism.IO\Reaganism.IO.csproj"/>
     </ItemGroup>
 
